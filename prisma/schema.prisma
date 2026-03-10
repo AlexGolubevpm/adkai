@@ -30,6 +30,8 @@ model Site {
   name        String
   slug        String   @unique
   externalKey String?  @map("external_key")
+  asgId       Int?     @unique @map("asg_id")
+  domain      String?
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -39,8 +41,22 @@ model Site {
   dailyFormatStats DailyFormatStat[]
   costsDaily       CostDaily[]
   conclusions      ConclusionDaily[]
+  spots            AdSpot[]
 
   @@map("sites")
+}
+
+model AdSpot {
+  id         String @id @default(cuid())
+  siteId     String @map("site_id")
+  asgId      Int    @unique @map("asg_id")
+  name       String
+  adType     String @map("ad_type")
+
+  site       Site   @relation(fields: [siteId], references: [id])
+  dailySpotStats DailySpotStat[]
+
+  @@map("ad_spots")
 }
 
 model DailyStat {
@@ -48,6 +64,19 @@ model DailyStat {
   statDate           DateTime @map("stat_date") @db.Date
   siteId             String   @map("site_id")
   bundleId           String   @map("bundle_id")
+  // Traffic & engagement
+  hits               Int      @default(0)
+  clicks             Int      @default(0)
+  impressions        Int      @default(0)
+  // Revenue from ASG
+  brokerIncome       Decimal  @default(0) @map("broker_income") @db.Decimal(12, 4)
+  predictedIncome    Decimal  @default(0) @map("predicted_income") @db.Decimal(12, 4)
+  // Rates
+  ctr                Decimal  @default(0) @db.Decimal(8, 4)
+  fillRate           Decimal  @default(0) @map("fill_rate") @db.Decimal(8, 4)
+  realCpm            Decimal  @default(0) @map("real_cpm") @db.Decimal(10, 6)
+  brokerCpm          Decimal  @default(0) @map("broker_cpm") @db.Decimal(10, 6)
+  // Calculated fields
   traffic            Int      @default(0)
   revenue            Decimal  @default(0) @db.Decimal(12, 4)
   costs              Decimal  @default(0) @db.Decimal(12, 4)
@@ -68,12 +97,42 @@ model DailyStat {
   @@map("daily_stats")
 }
 
+model DailySpotStat {
+  id                 String   @id @default(cuid())
+  statDate           DateTime @map("stat_date") @db.Date
+  spotId             String   @map("spot_id")
+  hits               Int      @default(0)
+  clicks             Int      @default(0)
+  impressions        Int      @default(0)
+  brokerIncome       Decimal  @default(0) @map("broker_income") @db.Decimal(12, 4)
+  predictedIncome    Decimal  @default(0) @map("predicted_income") @db.Decimal(12, 4)
+  ctr                Decimal  @default(0) @db.Decimal(8, 4)
+  fillRate           Decimal  @default(0) @map("fill_rate") @db.Decimal(8, 4)
+  realCpm            Decimal  @default(0) @map("real_cpm") @db.Decimal(10, 6)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  spot AdSpot @relation(fields: [spotId], references: [id])
+
+  @@unique([statDate, spotId])
+  @@index([statDate])
+  @@map("daily_spot_stats")
+}
+
 model DailyFormatStat {
   id                 String   @id @default(cuid())
   statDate           DateTime @map("stat_date") @db.Date
   siteId             String   @map("site_id")
   bundleId           String   @map("bundle_id")
   formatName         String   @map("format_name")
+  hits               Int      @default(0)
+  clicks             Int      @default(0)
+  impressions        Int      @default(0)
+  brokerIncome       Decimal  @default(0) @map("broker_income") @db.Decimal(12, 4)
+  predictedIncome    Decimal  @default(0) @map("predicted_income") @db.Decimal(12, 4)
+  ctr                Decimal  @default(0) @db.Decimal(8, 4)
+  fillRate           Decimal  @default(0) @map("fill_rate") @db.Decimal(8, 4)
+  // Legacy compat
   traffic            Int      @default(0)
   revenue            Decimal  @default(0) @db.Decimal(12, 4)
   revenuePer1000     Decimal  @default(0) @map("revenue_per_1000_users") @db.Decimal(10, 4)
@@ -93,6 +152,11 @@ model DailyBundleStat {
   id                 String   @id @default(cuid())
   statDate           DateTime @map("stat_date") @db.Date
   bundleId           String   @map("bundle_id")
+  hits               Int      @default(0)
+  clicks             Int      @default(0)
+  impressions        Int      @default(0)
+  brokerIncome       Decimal  @default(0) @map("broker_income") @db.Decimal(12, 4)
+  predictedIncome    Decimal  @default(0) @map("predicted_income") @db.Decimal(12, 4)
   traffic            Int      @default(0)
   revenue            Decimal  @default(0) @db.Decimal(12, 4)
   costs              Decimal  @default(0) @db.Decimal(12, 4)
