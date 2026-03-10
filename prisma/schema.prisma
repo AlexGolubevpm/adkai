@@ -211,7 +211,8 @@ model ConclusionDaily {
   statDate    DateTime @map("stat_date") @db.Date
   category    String
   entityType  String   @map("entity_type")
-  entityId    String?  @map("entity_id")
+  siteId      String?  @map("site_id")
+  bundleId    String?  @map("bundle_id")
   title       String
   description String?
   metricName  String   @map("metric_name")
@@ -220,8 +221,8 @@ model ConclusionDaily {
   rankType    String   @map("rank_type")
   createdAt   DateTime @default(now()) @map("created_at")
 
-  site   Site?   @relation(fields: [entityId], references: [id])
-  bundle Bundle? @relation(fields: [entityId], references: [id])
+  site   Site?   @relation(fields: [siteId], references: [id])
+  bundle Bundle? @relation(fields: [bundleId], references: [id])
 
   @@index([statDate, category])
   @@map("conclusions_daily")
