@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bundle {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sites            Site[]
+  dailyStats       DailyStat[]
+  dailyFormatStats DailyFormatStat[]
+  dailyBundleStats DailyBundleStat[]
+  costsDaily       CostDaily[]
+  conclusions      ConclusionDaily[]
+
+  @@map("bundles")
+}
+
+model Site {
+  id          String   @id @default(cuid())
+  bundleId    String   @map("bundle_id")
+  name        String
+  slug        String   @unique
+  externalKey String?  @map("external_key")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  bundle           Bundle            @relation(fields: [bundleId], references: [id])
+  dailyStats       DailyStat[]
+  dailyFormatStats DailyFormatStat[]
+  costsDaily       CostDaily[]
+  conclusions      ConclusionDaily[]
+
+  @@map("sites")
+}
+
+model DailyStat {
+  id                 String   @id @default(cuid())
+  statDate           DateTime @map("stat_date") @db.Date
+  siteId             String   @map("site_id")
+  bundleId           String   @map("bundle_id")
+  traffic            Int      @default(0)
+  revenue            Decimal  @default(0) @db.Decimal(12, 4)
+  costs              Decimal  @default(0) @db.Decimal(12, 4)
+  profit             Decimal  @default(0) @db.Decimal(12, 4)
+  romi               Decimal  @default(0) @db.Decimal(8, 2)
+  revenuePer1000     Decimal  @default(0) @map("revenue_per_1000_users") @db.Decimal(10, 4)
+  healthScore        Int      @default(0) @map("health_score")
+  healthStatus       String   @default("healthy") @map("health_status")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  site   Site   @relation(fields: [siteId], references: [id])
+  bundle Bundle @relation(fields: [bundleId], references: [id])
+
+  @@unique([statDate, siteId])
+  @@index([statDate])
+  @@index([bundleId, statDate])
+  @@map("daily_stats")
+}
+
+model DailyFormatStat {
+  id                 String   @id @default(cuid())
+  statDate           DateTime @map("stat_date") @db.Date
+  siteId             String   @map("site_id")
+  bundleId           String   @map("bundle_id")
+  formatName         String   @map("format_name")
+  traffic            Int      @default(0)
+  revenue            Decimal  @default(0) @db.Decimal(12, 4)
+  revenuePer1000     Decimal  @default(0) @map("revenue_per_1000_users") @db.Decimal(10, 4)
+  sharePercent       Decimal  @default(0) @map("share_percent") @db.Decimal(5, 2)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  site   Site   @relation(fields: [siteId], references: [id])
+  bundle Bundle @relation(fields: [bundleId], references: [id])
+
+  @@unique([statDate, siteId, formatName])
+  @@index([statDate])
+  @@map("daily_format_stats")
+}
+
+model DailyBundleStat {
+  id                 String   @id @default(cuid())
+  statDate           DateTime @map("stat_date") @db.Date
+  bundleId           String   @map("bundle_id")
+  traffic            Int      @default(0)
+  revenue            Decimal  @default(0) @db.Decimal(12, 4)
+  costs              Decimal  @default(0) @db.Decimal(12, 4)
+  profit             Decimal  @default(0) @db.Decimal(12, 4)
+  romi               Decimal  @default(0) @db.Decimal(8, 2)
+  revenuePer1000     Decimal  @default(0) @map("revenue_per_1000_users") @db.Decimal(10, 4)
+  healthScore        Int      @default(0) @map("health_score")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  bundle Bundle @relation(fields: [bundleId], references: [id])
+
+  @@unique([statDate, bundleId])
+  @@index([statDate])
+  @@map("daily_bundle_stats")
+}
+
+model CostDaily {
+  id            String   @id @default(cuid())
+  statDate      DateTime @map("stat_date") @db.Date
+  siteId        String   @map("site_id")
+  bundleId      String   @map("bundle_id")
+  costValue     Decimal  @map("cost_value") @db.Decimal(12, 4)
+  sourceType    String   @default("google_sheets") @map("source_type")
+  sourceRowKey  String?  @map("source_row_key")
+  syncedAt      DateTime @default(now()) @map("synced_at")
+
+  site   Site   @relation(fields: [siteId], references: [id])
+  bundle Bundle @relation(fields: [bundleId], references: [id])
+
+  @@unique([statDate, siteId])
+  @@index([statDate])
+  @@map("costs_daily")
+}
+
+model SyncRun {
+  id             String    @id @default(cuid())
+  sourceType     String    @map("source_type")
+  runType        String    @map("run_type")
+  runStatus      String    @default("pending") @map("run_status")
+  startedAt      DateTime  @default(now()) @map("started_at")
+  finishedAt     DateTime? @map("finished_at")
+  payloadMeta    Json?     @map("payload_meta")
+  errorText      String?   @map("error_text")
+
+  @@index([sourceType, startedAt])
+  @@map("sync_runs")
+}
+
+model ConclusionDaily {
+  id          String   @id @default(cuid())
+  statDate    DateTime @map("stat_date") @db.Date
+  category    String
+  entityType  String   @map("entity_type")
+  entityId    String?  @map("entity_id")
+  title       String
+  description String?
+  metricName  String   @map("metric_name")
+  metricValue Decimal  @map("metric_value") @db.Decimal(12, 4)
+  deltaValue  Decimal? @map("delta_value") @db.Decimal(12, 4)
+  rankType    String   @map("rank_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  site   Site?   @relation(fields: [entityId], references: [id])
+  bundle Bundle? @relation(fields: [entityId], references: [id])
+
+  @@index([statDate, category])
+  @@map("conclusions_daily")
+}
+
+model AnalysisRun {
+  id              String   @id @default(cuid())
+  periodFrom      DateTime @map("period_from") @db.Date
+  periodTo        DateTime @map("period_to") @db.Date
+  triggerType     String   @default("manual") @map("trigger_type")
+  requestPayload  Json?    @map("request_payload")
+  responsePayload Json?    @map("response_payload")
+  summaryText     String?  @map("summary_text")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("analysis_runs")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
