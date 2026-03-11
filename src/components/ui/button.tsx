@@ -3,24 +3,26 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       variant: {
         default:
-          "bg-zinc-100 text-zinc-900 hover:bg-zinc-200",
+          "bg-[var(--primary)] text-white hover:bg-[var(--primary-hover)] shadow-sm shadow-[var(--primary)]/20",
         outline:
-          "border border-zinc-700 bg-transparent text-zinc-100 hover:bg-zinc-800 hover:text-zinc-100",
+          "border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)]",
         ghost:
-          "bg-transparent text-zinc-100 hover:bg-zinc-800 hover:text-zinc-100",
+          "bg-transparent text-[var(--foreground-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]",
         destructive:
-          "bg-red-600 text-white hover:bg-red-700",
+          "bg-[var(--danger)] text-white hover:bg-[var(--danger)]/90 shadow-sm shadow-[var(--danger)]/20",
+        secondary:
+          "bg-[var(--surface-2)] text-[var(--foreground)] hover:bg-[var(--surface-3)]",
       },
       size: {
-        default: "h-10 px-4 py-2",
+        default: "h-9 px-4 py-2",
         sm: "h-8 px-3 text-xs",
-        lg: "h-12 px-6 text-base",
-        icon: "h-10 w-10",
+        lg: "h-11 px-6 text-base",
+        icon: "h-9 w-9",
       },
     },
     defaultVariants: {

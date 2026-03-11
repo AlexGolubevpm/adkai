@@ -9,7 +9,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     <select
       ref={ref}
       className={cn(
-        "flex h-10 w-full appearance-none rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 pr-8 text-sm text-zinc-100 ring-offset-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-9 w-full appearance-none rounded-lg border border-[var(--border)] bg-[var(--surface-0)] px-3 py-2 pr-8 text-sm text-[var(--foreground)] ring-offset-[var(--background)] placeholder:text-[var(--foreground-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
         className
       )}
       {...props}
@@ -26,7 +26,7 @@ const SelectOption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <option
     ref={ref}
-    className={cn("bg-zinc-800 text-zinc-100", className)}
+    className={cn("bg-[var(--surface-1)] text-[var(--foreground)]", className)}
     {...props}
   />
 ));

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Select, SelectOption } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/utils";
 import {
   RefreshCw,
@@ -20,11 +22,8 @@ import {
   BarChart3,
   AlertTriangle,
   FileSpreadsheet,
+  TrendingDown,
 } from "lucide-react";
-
-// ---------------------------------------------------------------------------
-// Mock data
-// ---------------------------------------------------------------------------
 
 interface CostEntry {
   id: number;
@@ -69,13 +68,16 @@ const UNMATCHED_ENTRIES: UnmatchedEntry[] = [
   { id: 3, sheetRow: 88, rawSiteName: "javstream.net", rawBundle: "JAV", cost: 91.00, reason: "Site was deleted / archived" },
 ];
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+const BUNDLE_COLORS: Record<string, string> = {
+  Gays: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Trans: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+  Hentai: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  JAV: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+};
 
 export default function CostsPage() {
   const [bundleFilter, setBundleFilter] = useState("all");
-  const [periodFilter, setPeriodFilter] = useState("today");
+  const [tab, setTab] = useState("entries");
 
   const filtered = COST_DATA.filter((e) =>
     bundleFilter === "all" ? true : e.bundle === bundleFilter
@@ -85,163 +87,182 @@ export default function CostsPage() {
   const uniqueSites = new Set(filtered.map((e) => e.site)).size;
   const avgCostPerSite = uniqueSites > 0 ? totalCosts / uniqueSites : 0;
 
+  const kpis = [
+    { label: "Total Costs", value: formatCurrency(totalCosts), icon: DollarSign, color: "#ef4444" },
+    { label: "Avg per Site", value: formatCurrency(avgCostPerSite), icon: BarChart3, color: "#f59e0b" },
+    { label: "Unmatched", value: String(UNMATCHED_ENTRIES.length), icon: AlertTriangle, color: "#eab308" },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* ---- Header ---- */}
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold text-zinc-100">Costs</h1>
-          <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <span className="relative flex h-2.5 w-2.5">
+        <div>
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Costs</h1>
+          <div className="mt-1 flex items-center gap-2 text-sm text-[var(--foreground-muted)]">
+            <div className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            </span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </div>
             Last synced: 2h ago
           </div>
         </div>
-        <Button variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Refresh
+        <Button variant="outline" size="sm" className="gap-2">
+          <RefreshCw className="h-3.5 w-3.5" />
+          Sync Costs
         </Button>
       </div>
 
-      {/* ---- Summary cards ---- */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Total Costs</CardTitle>
-            <DollarSign className="h-4 w-4 text-zinc-500" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-zinc-100">{formatCurrency(totalCosts)}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Avg Cost per Site</CardTitle>
-            <BarChart3 className="h-4 w-4 text-zinc-500" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-zinc-100">{formatCurrency(avgCostPerSite)}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Unmatched Sites</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-yellow-400">{UNMATCHED_ENTRIES.length}</p>
-          </CardContent>
-        </Card>
+      {/* KPI Cards */}
+      <div className="grid gap-4 sm:grid-cols-3 stagger-children">
+        {kpis.map((kpi) => (
+          <Card key={kpi.label} className="relative overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-subtle)]">
+                  {kpi.label}
+                </span>
+                <kpi.icon className="h-4 w-4" style={{ color: kpi.color }} />
+              </div>
+              <p className="text-2xl font-bold tabular-nums" style={{ color: kpi.color }}>
+                {kpi.value}
+              </p>
+            </CardContent>
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-40" style={{ backgroundColor: kpi.color }} />
+          </Card>
+        ))}
       </div>
 
-      {/* ---- Filters ---- */}
-      <div className="flex items-center gap-4">
-        <div className="w-48">
-          <Select value={bundleFilter} onChange={(e) => setBundleFilter(e.target.value)}>
-            <SelectOption value="all">All Bundles</SelectOption>
-            <SelectOption value="Gays">Gays</SelectOption>
-            <SelectOption value="Trans">Trans</SelectOption>
-            <SelectOption value="Hentai">Hentai</SelectOption>
-            <SelectOption value="JAV">JAV</SelectOption>
-          </Select>
-        </div>
-
-        <div className="w-48">
-          <Select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)}>
-            <SelectOption value="today">Today</SelectOption>
-            <SelectOption value="yesterday">Yesterday</SelectOption>
-            <SelectOption value="7d">Last 7 days</SelectOption>
-            <SelectOption value="30d">Last 30 days</SelectOption>
-          </Select>
-        </div>
+      {/* Filter */}
+      <div className="flex items-center gap-3">
+        <Select
+          value={bundleFilter}
+          onChange={(e) => setBundleFilter(e.target.value)}
+          className="w-40"
+        >
+          <SelectOption value="all">All Bundles</SelectOption>
+          <SelectOption value="Gays">Gays</SelectOption>
+          <SelectOption value="Trans">Trans</SelectOption>
+          <SelectOption value="Hentai">Hentai</SelectOption>
+          <SelectOption value="JAV">JAV</SelectOption>
+        </Select>
+        <Badge variant="secondary">
+          {filtered.length} entries
+        </Badge>
       </div>
 
-      {/* ---- Costs table ---- */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Cost Entries</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Site / Tube</TableHead>
-                <TableHead>Bundle</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Cost ($)</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Last Sync</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((entry) => (
-                <TableRow key={entry.id}>
-                  <TableCell className="font-medium">{entry.site}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{entry.bundle}</Badge>
-                  </TableCell>
-                  <TableCell className="text-zinc-400">{entry.date}</TableCell>
-                  <TableCell className="text-right font-mono">
-                    {formatCurrency(entry.cost)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5 text-zinc-400">
-                      <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-500" />
-                      {entry.source}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-zinc-500">{entry.lastSync}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      {/* Tabs */}
+      <Tabs value={tab} onChange={setTab}>
+        <TabsList>
+          <TabsTrigger value="entries">Cost Entries</TabsTrigger>
+          <TabsTrigger value="unmatched">
+            Unmatched ({UNMATCHED_ENTRIES.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {/* ---- Unmatched entries ---- */}
-      <Card className="border-yellow-400/20">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-yellow-400" />
-            <CardTitle>Unmatched Entries</CardTitle>
-          </div>
-          <p className="text-sm text-zinc-400">
-            Rows from Google Sheets that could not be mapped to any known site.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Sheet Row</TableHead>
-                <TableHead>Raw Site Name</TableHead>
-                <TableHead>Bundle</TableHead>
-                <TableHead className="text-right">Cost ($)</TableHead>
-                <TableHead>Reason</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {UNMATCHED_ENTRIES.map((entry) => (
-                <TableRow key={entry.id}>
-                  <TableCell className="font-mono text-zinc-500">#{entry.sheetRow}</TableCell>
-                  <TableCell className="font-medium text-yellow-300">{entry.rawSiteName}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{entry.rawBundle}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-mono">
-                    {formatCurrency(entry.cost)}
-                  </TableCell>
-                  <TableCell className="text-zinc-400">{entry.reason}</TableCell>
+        <TabsContent value="entries">
+          <Card>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Site</TableHead>
+                  <TableHead>Bundle</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Cost</TableHead>
+                  <TableHead>Source</TableHead>
+                  <TableHead>Synced</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((entry) => (
+                  <TableRow key={entry.id}>
+                    <TableCell className="font-medium text-[var(--foreground)]">
+                      {entry.site}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${
+                          BUNDLE_COLORS[entry.bundle] ?? ""
+                        }`}
+                      >
+                        {entry.bundle}
+                      </span>
+                    </TableCell>
+                    <TableCell className="tabular-nums text-[var(--foreground-muted)]">
+                      {entry.date}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums font-medium text-red-400">
+                      {formatCurrency(entry.cost)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5 text-[var(--foreground-muted)]">
+                        <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-500" />
+                        <span className="text-xs">{entry.source}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-xs text-[var(--foreground-subtle)]">
+                      {entry.lastSync}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="unmatched">
+          <Card className="border-yellow-500/20">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                <CardTitle>Unmatched Entries</CardTitle>
+              </div>
+              <p className="text-xs text-[var(--foreground-muted)]">
+                Rows from Google Sheets that could not be mapped to any known site.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Row</TableHead>
+                    <TableHead>Raw Site Name</TableHead>
+                    <TableHead>Bundle</TableHead>
+                    <TableHead className="text-right">Cost</TableHead>
+                    <TableHead>Reason</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {UNMATCHED_ENTRIES.map((entry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell className="tabular-nums text-[var(--foreground-subtle)]">
+                        #{entry.sheetRow}
+                      </TableCell>
+                      <TableCell className="font-medium text-yellow-400">
+                        {entry.rawSiteName}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{entry.rawBundle}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums font-medium text-red-400">
+                        {formatCurrency(entry.cost)}
+                      </TableCell>
+                      <TableCell className="text-xs text-[var(--foreground-muted)]">
+                        {entry.reason}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </motion.div>
   );
 }

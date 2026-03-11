@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Calendar } from "lucide-react";
+import { ChevronDown, Calendar, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export type PeriodValue = {
   preset: string;
@@ -14,7 +15,7 @@ const presets = [
   { label: "Yesterday", value: "yesterday" },
   { label: "Last 7 days", value: "last_7_days" },
   { label: "Last 30 days", value: "last_30_days" },
-  { label: "Custom", value: "custom" },
+  { label: "Custom range", value: "custom" },
 ];
 
 interface PeriodFilterProps {
@@ -54,55 +55,69 @@ export default function PeriodFilter({ value, onChange }: PeriodFilterProps) {
     <div ref={ref} className="relative inline-block">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-700 hover:border-zinc-600"
+        className={cn(
+          "flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-all duration-150",
+          open
+            ? "border-indigo-500/50 bg-[var(--surface-2)] text-[var(--foreground)] shadow-sm shadow-indigo-500/10"
+            : "border-[var(--border)] bg-[var(--surface-1)] text-[var(--foreground-muted)] hover:border-[var(--border-hover)] hover:text-[var(--foreground)]"
+        )}
       >
-        <Calendar className="h-4 w-4 text-zinc-400" />
+        <Calendar className="h-3.5 w-3.5" />
         {currentLabel}
         <ChevronDown
-          className={`h-4 w-4 text-zinc-400 transition-transform ${
-            open ? "rotate-180" : ""
-          }`}
+          className={cn(
+            "h-3.5 w-3.5 transition-transform duration-150",
+            open && "rotate-180"
+          )}
         />
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-64 rounded-lg border border-zinc-700 bg-zinc-800 p-1 shadow-xl">
+        <div className="absolute right-0 z-50 mt-1.5 w-56 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-1.5 shadow-2xl shadow-black/40 animate-fade-in">
           {presets.map((preset) => (
             <button
               key={preset.value}
               onClick={() => handleSelect(preset.value)}
-              className={`flex w-full items-center rounded-md px-3 py-2 text-sm transition-colors ${
+              className={cn(
+                "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-100",
                 value.preset === preset.value
                   ? "bg-indigo-500/10 text-indigo-400"
-                  : "text-zinc-300 hover:bg-zinc-700 hover:text-white"
-              }`}
+                  : "text-[var(--foreground-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
+              )}
             >
               {preset.label}
+              {value.preset === preset.value && (
+                <Check className="h-3.5 w-3.5 text-indigo-400" />
+              )}
             </button>
           ))}
 
           {value.preset === "custom" && (
-            <div className="mt-2 space-y-2 border-t border-zinc-700 px-3 pt-3 pb-2">
+            <div className="mt-1.5 space-y-2 border-t border-[var(--border)] px-3 pt-3 pb-2">
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">From</label>
+                <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[var(--foreground-subtle)]">
+                  From
+                </label>
                 <input
                   type="date"
                   value={value.from ?? ""}
                   onChange={(e) =>
                     onChange({ ...value, from: e.target.value })
                   }
-                  className="w-full rounded-md border border-zinc-600 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-0)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-zinc-400">To</label>
+                <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[var(--foreground-subtle)]">
+                  To
+                </label>
                 <input
                   type="date"
                   value={value.to ?? ""}
                   onChange={(e) =>
                     onChange({ ...value, to: e.target.value })
                   }
-                  className="w-full rounded-md border border-zinc-600 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-0)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
                 />
               </div>
             </div>
