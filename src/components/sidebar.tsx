@@ -9,6 +9,7 @@ import {
   FileText,
   Brain,
   Activity,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +37,12 @@ const navItems = [
     href: "/conclusions",
     icon: FileText,
     description: "Daily insights",
+  },
+  {
+    label: "Forecast",
+    href: "/forecast",
+    icon: TrendingUp,
+    description: "CPM & revenue modeling",
   },
   {
     label: "Analysis",
