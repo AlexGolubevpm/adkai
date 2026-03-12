@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
 import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { HealthBadge } from "@/components/ui/health-badge";
 import { cn } from "@/lib/utils";
 import {
   TrendingDown,
@@ -23,6 +26,7 @@ interface ConclusionCard {
   metricValue: string;
   delta: number;
   explanation: string;
+  healthScore?: number;
 }
 
 const DATES = [
@@ -33,17 +37,17 @@ const DATES = [
 ];
 
 const WORST_SITES: ConclusionCard[] = [
-  { id: 1, category: "Health Score", entity: "transvids.net", bundle: "Trans", metricName: "Lowest Health", metricValue: "32", delta: -18.5, explanation: "Traffic dropped 34% with zero pop revenue. All format eCPMs below threshold." },
-  { id: 2, category: "ROMI", entity: "hentaivault.net", bundle: "Hentai", metricName: "Lowest ROMI", metricValue: "-42%", delta: -27.3, explanation: "Costs surged to $198 while revenue fell to $115. Banner and slider formats underperforming." },
-  { id: 3, category: "Revenue", entity: "javworld.com", bundle: "JAV", metricName: "Biggest Revenue Drop", metricValue: "-$312", delta: -41.0, explanation: "Lost primary pop demand partner. Vast fill rate collapsed from 78% to 12%." },
-  { id: 4, category: "Traffic", entity: "gayhub.net", bundle: "Gays", metricName: "Biggest Traffic Loss", metricValue: "-89K visits", delta: -32.1, explanation: "Google deindexed 1.2K pages after content policy review. Organic traffic near zero." },
+  { id: 1, category: "Health Score", entity: "transvids.net", bundle: "Trans", metricName: "Lowest Health", metricValue: "32", delta: -18.5, explanation: "Traffic dropped 34% with zero pop revenue. All format eCPMs below threshold.", healthScore: 32 },
+  { id: 2, category: "ROMI", entity: "hentaivault.net", bundle: "Hentai", metricName: "Lowest ROMI", metricValue: "-42%", delta: -27.3, explanation: "Costs surged to $198 while revenue fell to $115. Banner and slider formats underperforming.", healthScore: 38 },
+  { id: 3, category: "Revenue", entity: "javworld.com", bundle: "JAV", metricName: "Biggest Revenue Drop", metricValue: "-$312", delta: -41.0, explanation: "Lost primary pop demand partner. Vast fill rate collapsed from 78% to 12%.", healthScore: 41 },
+  { id: 4, category: "Traffic", entity: "gayhub.net", bundle: "Gays", metricName: "Biggest Traffic Loss", metricValue: "-89K visits", delta: -32.1, explanation: "Google deindexed 1.2K pages after content policy review. Organic traffic near zero.", healthScore: 35 },
 ];
 
 const BEST_SITES: ConclusionCard[] = [
-  { id: 1, category: "Health Score", entity: "gaytube1.com", bundle: "Gays", metricName: "Highest Health", metricValue: "94", delta: 6.2, explanation: "All formats above target eCPM. Push opt-in rate hit 14%, highest in bundle." },
-  { id: 2, category: "ROMI", entity: "hentaistream.com", bundle: "Hentai", metricName: "Best ROMI", metricValue: "340%", delta: 45.8, explanation: "New outstream placement driving $0.82 eCPM. Costs stable at $312 with $1,375 revenue." },
-  { id: 3, category: "Revenue", entity: "javflix.com", bundle: "JAV", metricName: "Top Revenue", metricValue: "$1,847", delta: 22.4, explanation: "Vast pre-roll eCPM jumped to $3.20 after adding tier-1 demand. Pop also up 18%." },
-  { id: 4, category: "Traffic", entity: "transtube1.com", bundle: "Trans", metricName: "Biggest Traffic Gain", metricValue: "+127K visits", delta: 48.7, explanation: "Viral content spike from social referrals. Conversion to push subscribers up 3x." },
+  { id: 1, category: "Health Score", entity: "gaytube1.com", bundle: "Gays", metricName: "Highest Health", metricValue: "94", delta: 6.2, explanation: "All formats above target eCPM. Push opt-in rate hit 14%, highest in bundle.", healthScore: 94 },
+  { id: 2, category: "ROMI", entity: "hentaistream.com", bundle: "Hentai", metricName: "Best ROMI", metricValue: "340%", delta: 45.8, explanation: "New outstream placement driving $0.82 eCPM. Costs stable at $312 with $1,375 revenue.", healthScore: 91 },
+  { id: 3, category: "Revenue", entity: "javflix.com", bundle: "JAV", metricName: "Top Revenue", metricValue: "$1,847", delta: 22.4, explanation: "Vast pre-roll eCPM jumped to $3.20 after adding tier-1 demand. Pop also up 18%.", healthScore: 88 },
+  { id: 4, category: "Traffic", entity: "transtube1.com", bundle: "Trans", metricName: "Biggest Traffic Gain", metricValue: "+127K visits", delta: 48.7, explanation: "Viral content spike from social referrals. Conversion to push subscribers up 3x.", healthScore: 85 },
 ];
 
 const WORST_FORMATS: ConclusionCard[] = [
@@ -78,7 +82,6 @@ function ConclusionSection({
   accent: "red" | "green";
   items: ConclusionCard[];
 }) {
-  const accentBorder = accent === "red" ? "border-red-500/20" : "border-emerald-500/20";
   const iconColor = accent === "red" ? "text-red-600" : "text-emerald-600";
 
   return (
@@ -90,67 +93,50 @@ function ConclusionSection({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => (
-          <div
+          <motion.div
             key={item.id}
-            className={cn("section-panel relative overflow-hidden", accentBorder)}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: item.id * 0.05 }}
           >
-            <div className="p-4 pb-2">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-subtle)]">
-                  {item.category}
-                </span>
-                {item.bundle && (
-                  <span
-                    className={cn(
-                      "inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium",
-                      BUNDLE_COLORS[item.bundle] ?? ""
-                    )}
-                  >
-                    {item.bundle}
+            <Card className={cn(
+              "relative overflow-hidden hover:shadow-[var(--shadow-card-hover)] transition-all",
+              accent === "red" ? "border-red-500/20" : "border-emerald-500/20"
+            )}>
+              <CardContent className="p-4 pb-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-subtle)]">
+                    {item.category}
                   </span>
-                )}
-              </div>
-              <h3 style={{ fontSize: "var(--text-base, 1rem)", fontWeight: 600, color: "var(--foreground)" }}>
-                {item.entity}
-              </h3>
-            </div>
-            <div className="space-y-2 p-4 pt-0">
-              <div>
-                <span className="text-xs text-[var(--foreground-muted)]">{item.metricName}</span>
-                <p
-                  className={cn(
-                    "text-xl font-bold tabular-nums mt-0.5",
-                    accent === "red" ? "text-red-600" : "text-emerald-600"
-                  )}
-                >
-                  {item.metricValue}
-                </p>
-              </div>
-              <div
-                className={cn(
-                  "flex items-center gap-1 text-xs font-medium tabular-nums",
-                  item.delta >= 0 ? "text-emerald-600" : "text-red-600"
-                )}
-              >
-                {item.delta >= 0 ? (
-                  <TrendingUp className="h-3 w-3" />
-                ) : (
-                  <TrendingDown className="h-3 w-3" />
-                )}
-                {item.delta >= 0 ? "+" : ""}
-                {item.delta.toFixed(1)}%
-              </div>
-              <p className="text-[11px] leading-relaxed text-[var(--foreground-muted)]">
-                {item.explanation}
-              </p>
-            </div>
-            <div
-              className={cn(
-                "absolute bottom-0 left-0 right-0 h-[2px] opacity-30",
-                accent === "red" ? "bg-red-500" : "bg-emerald-500"
-              )}
-            />
-          </div>
+                  <div className="flex items-center gap-1.5">
+                    {item.healthScore !== undefined && (
+                      <HealthBadge score={item.healthScore} showLabel={false} />
+                    )}
+                    {item.bundle && (
+                      <span className={cn("inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium", BUNDLE_COLORS[item.bundle] ?? "")}>
+                        {item.bundle}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <h3 className="text-sm font-semibold text-[var(--foreground)]">{item.entity}</h3>
+              </CardContent>
+              <CardContent className="space-y-2 p-4 pt-0">
+                <div>
+                  <span className="text-xs text-[var(--foreground-muted)]">{item.metricName}</span>
+                  <p className={cn("text-xl font-bold tabular-nums mt-0.5", accent === "red" ? "text-red-600" : "text-emerald-600")}>
+                    {item.metricValue}
+                  </p>
+                </div>
+                <div className={cn("flex items-center gap-1 text-xs font-medium tabular-nums", item.delta >= 0 ? "text-emerald-600" : "text-red-600")}>
+                  {item.delta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                  {item.delta >= 0 ? "+" : ""}{item.delta.toFixed(1)}%
+                </div>
+                <p className="text-[11px] leading-relaxed text-[var(--foreground-muted)]">{item.explanation}</p>
+              </CardContent>
+              <div className={cn("absolute bottom-0 left-0 right-0 h-[2px] opacity-30", accent === "red" ? "bg-red-500" : "bg-emerald-500")} />
+            </Card>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -169,23 +155,11 @@ export default function ConclusionsPage() {
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p style={{ fontSize: "var(--text-sm)", color: "var(--foreground-muted)" }}>
-            AI-generated insights and key findings
-          </p>
-        </div>
+        <p className="text-sm text-[var(--foreground-muted)]">AI-generated insights and key findings</p>
         <div className="flex items-center gap-2">
           <Calendar className="h-3.5 w-3.5 text-[var(--foreground-subtle)]" />
-          <Select
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-44"
-          >
-            {DATES.map((d) => (
-              <SelectOption key={d.value} value={d.value}>
-                {d.label}
-              </SelectOption>
-            ))}
+          <Select value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="w-44">
+            {DATES.map((d) => (<SelectOption key={d.value} value={d.value}>{d.label}</SelectOption>))}
           </Select>
         </div>
       </div>

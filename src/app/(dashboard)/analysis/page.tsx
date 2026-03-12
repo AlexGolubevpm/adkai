@@ -4,6 +4,15 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Brain,
@@ -59,25 +68,13 @@ export default function AnalysisPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6"
+      className="space-y-7"
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <p style={{ fontSize: "var(--text-sm)", color: "var(--foreground-muted)" }}>
-            AI-powered insights for your ad network
-          </p>
-        </div>
-        <Button
-          onClick={handleRunAnalysis}
-          disabled={isRunning}
-          className="gap-2"
-        >
-          {isRunning ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
+        <p className="text-sm text-[var(--foreground-muted)]">AI-powered insights for your ad network</p>
+        <Button onClick={handleRunAnalysis} disabled={isRunning} className="gap-2">
+          {isRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
           {isRunning ? "Analyzing..." : "Run Analysis"}
         </Button>
       </div>
@@ -95,23 +92,24 @@ export default function AnalysisPage() {
         </TabsList>
 
         <TabsContent value="run">
-          {/* Status section */}
-          <div className="section-panel">
-            <div className="section-panel-header">
+          <Card>
+            <CardHeader>
               <div className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-indigo-600" />
-                <h2 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
-                  AI Analysis Engine
-                </h2>
+                <CardTitle className="text-sm">AI Analysis Engine</CardTitle>
               </div>
-            </div>
-            <div className="section-panel-content">
+            </CardHeader>
+            <CardContent>
               <p className="text-xs text-[var(--foreground-muted)] mb-4">
                 Analyze your data using AI to find patterns, anomalies, and optimization opportunities.
               </p>
 
               {isRunning && (
-                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-12 gap-4"
+                >
                   <div className="relative">
                     <div className="h-16 w-16 rounded-full border-2 border-indigo-500/20 flex items-center justify-center">
                       <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
@@ -122,11 +120,15 @@ export default function AnalysisPage() {
                     <p className="text-sm font-medium text-[var(--foreground)]">Running analysis...</p>
                     <p className="text-xs text-[var(--foreground-muted)] mt-1">This may take a few moments</p>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {!isRunning && !result && (
-                <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-16 gap-4 text-center"
+                >
                   <div className="h-16 w-16 rounded-full bg-indigo-500/10 flex items-center justify-center">
                     <Brain className="h-8 w-8 text-indigo-600" />
                   </div>
@@ -136,73 +138,77 @@ export default function AnalysisPage() {
                       Click &quot;Run Analysis&quot; to generate AI-powered insights about your ad network performance, trends, and optimization opportunities.
                     </p>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {!isRunning && result && (
-                <div className="space-y-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-3"
+                >
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                     <span className="text-sm font-medium text-emerald-600">Analysis complete</span>
                   </div>
-                  <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-0)] p-4">
-                    <pre className="text-sm text-[var(--foreground-muted)] whitespace-pre-wrap font-sans leading-relaxed">
-                      {result}
-                    </pre>
-                  </div>
-                </div>
+                  <Card className="bg-[var(--surface-1)]">
+                    <CardContent className="p-4">
+                      <pre className="text-sm text-[var(--foreground-muted)] whitespace-pre-wrap font-sans leading-relaxed">
+                        {result}
+                      </pre>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="history">
           {history && history.length > 0 ? (
-            <div className="data-table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Completed</th>
-                    <th>Preview</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <Card className="overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Completed</TableHead>
+                    <TableHead>Preview</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {history.map((run) => {
                     const cfg = statusConfig[run.status];
                     const StatusIcon = cfg.icon;
                     return (
-                      <tr key={run.id}>
-                        <td>
+                      <TableRow key={run.id}>
+                        <TableCell>
                           <Badge variant={cfg.variant} className="gap-1">
                             <StatusIcon className={`h-3 w-3 ${run.status === "running" ? "animate-spin" : ""}`} />
                             {cfg.label}
                           </Badge>
-                        </td>
-                        <td className="tabular-nums text-[var(--foreground-muted)] text-xs">
+                        </TableCell>
+                        <TableCell className="text-xs text-[var(--foreground-muted)]">
                           {new Date(run.createdAt).toLocaleString()}
-                        </td>
-                        <td className="tabular-nums text-[var(--foreground-muted)] text-xs">
+                        </TableCell>
+                        <TableCell className="text-xs text-[var(--foreground-muted)]">
                           {run.completedAt ? new Date(run.completedAt).toLocaleString() : "\u2014"}
-                        </td>
-                        <td className="text-xs text-[var(--foreground-subtle)]" style={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        </TableCell>
+                        <TableCell className="text-xs text-[var(--foreground-subtle)] max-w-[300px] truncate">
                           {run.result?.slice(0, 80) ?? "\u2014"}
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </Card>
           ) : (
-            <div className="section-panel">
-              <div className="section-panel-content flex flex-col items-center justify-center py-16 text-[var(--foreground-subtle)]">
-                <FileText className="h-10 w-10 opacity-30 mb-3" />
-                <p className="text-sm">No analysis history yet</p>
-                <p className="text-xs mt-1">Run your first analysis to see results here</p>
-              </div>
-            </div>
+            <Card className="py-16 text-center">
+              <FileText className="h-10 w-10 mx-auto opacity-30 mb-3 text-[var(--foreground-subtle)]" />
+              <p className="text-sm text-[var(--foreground-subtle)]">No analysis history yet</p>
+              <p className="text-xs text-[var(--foreground-disabled)] mt-1">Run your first analysis to see results here</p>
+            </Card>
           )}
         </TabsContent>
       </Tabs>
