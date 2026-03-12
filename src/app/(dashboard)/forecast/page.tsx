@@ -25,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Select, SelectOption } from "@/components/ui/select";
+import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import PeriodFilter, { type PeriodValue } from "@/components/period-filter";
 import { useApi, periodToDateRange } from "@/lib/hooks";

@@ -1,94 +1,75 @@
 "use client";
 
 import * as React from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { cn } from "@/lib/utils";
 
-interface TabsContextValue {
-  value: string;
-  onChange: (value: string) => void;
+interface TabsProps extends Omit<React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>, "onChange"> {
+  onChange?: (value: string) => void;
 }
 
-const TabsContext = React.createContext<TabsContextValue>({
-  value: "",
-  onChange: () => {},
-});
+const Tabs = React.forwardRef<React.ComponentRef<typeof TabsPrimitive.Root>, TabsProps>(
+  ({ className, onChange, onValueChange, ...props }, ref) => (
+    <TabsPrimitive.Root
+      ref={ref}
+      className={cn("space-y-4", className)}
+      onValueChange={onValueChange ?? onChange}
+      {...props}
+    />
+  )
+);
+Tabs.displayName = "Tabs";
 
-interface TabsProps {
-  value: string;
-  onChange: (value: string) => void;
-  children: React.ReactNode;
-  className?: string;
-}
+const TabsList = React.forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn(
+      "inline-flex items-center gap-1 rounded-lg p-1",
+      className
+    )}
+    style={{
+      background: "var(--surface-2)",
+      border: "1px solid var(--border-subtle)",
+    }}
+    {...props}
+  />
+));
+TabsList.displayName = "TabsList";
 
-export function Tabs({ value, onChange, children, className }: TabsProps) {
-  return (
-    <TabsContext.Provider value={{ value, onChange }}>
-      <div className={cn("space-y-4", className)}>{children}</div>
-    </TabsContext.Provider>
-  );
-}
+const TabsTrigger = React.forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
+      "text-[var(--foreground-muted)] hover:text-[var(--foreground)]",
+      "data-[state=active]:bg-white data-[state=active]:text-[var(--foreground)] data-[state=active]:shadow-sm",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1",
+      className
+    )}
+    {...props}
+  />
+));
+TabsTrigger.displayName = "TabsTrigger";
 
-interface TabsListProps {
-  children: React.ReactNode;
-  className?: string;
-}
+const TabsContent = React.forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn(
+      "animate-fade-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
+      className
+    )}
+    {...props}
+  />
+));
+TabsContent.displayName = "TabsContent";
 
-export function TabsList({ children, className }: TabsListProps) {
-  return (
-    <div
-      className={cn(
-        "inline-flex items-center gap-1 rounded-lg p-1",
-        className
-      )}
-      style={{
-        background: "var(--surface-2)",
-        border: "1px solid var(--border-subtle)",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-interface TabsTriggerProps {
-  value: string;
-  children: React.ReactNode;
-  className?: string;
-}
-
-export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
-  const ctx = React.useContext(TabsContext);
-  const isActive = ctx.value === value;
-
-  return (
-    <button
-      onClick={() => ctx.onChange(value)}
-      className={cn(
-        "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-medium transition-all cursor-pointer",
-        isActive
-          ? "bg-white text-[var(--foreground)] shadow-sm"
-          : "text-[var(--foreground-muted)] hover:text-[var(--foreground)]",
-        className
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-interface TabsContentProps {
-  value: string;
-  children: React.ReactNode;
-  className?: string;
-}
-
-export function TabsContent({ value, children, className }: TabsContentProps) {
-  const ctx = React.useContext(TabsContext);
-  if (ctx.value !== value) return null;
-
-  return (
-    <div className={cn("animate-fade-in", className)}>
-      {children}
-    </div>
-  );
-}
+export { Tabs, TabsList, TabsTrigger, TabsContent };

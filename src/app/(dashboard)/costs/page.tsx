@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,7 +19,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import { Select, SelectOption } from "@/components/ui/select";
+import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -562,24 +569,24 @@ export default function CostsPage() {
       </Tabs>
 
       {/* ─── Add Sheet Modal ─── */}
-      <AnimatePresence>
-        {showAddSheet && (
-          <AddSheetModal
+      <Dialog open={showAddSheet} onOpenChange={setShowAddSheet}>
+        <DialogContent>
+          <AddSheetModalContent
             onClose={() => setShowAddSheet(false)}
             onCreated={() => {
               setShowAddSheet(false);
               fetchConfigs();
             }}
           />
-        )}
-      </AnimatePresence>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
 
-// ─── Add Sheet Modal ─────────────────────────────────────────────
+// ─── Add Sheet Modal Content ─────────────────────────────────────
 
-function AddSheetModal({
+function AddSheetModalContent({
   onClose,
   onCreated,
 }: {
@@ -690,36 +697,19 @@ function AddSheetModal({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="w-full max-w-2xl mx-4"
-      >
-        <Card className="border-[var(--border)]">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
-                </div>
-                <CardTitle>Connect Google Sheet</CardTitle>
-              </div>
-              <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+    <div className="space-y-4">
+      <DialogHeader>
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+            <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
+          </div>
+          <DialogTitle>Connect Google Sheet</DialogTitle>
+        </div>
+        <DialogDescription>
+          Connect a Google Sheet to import cost data automatically.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4">
             {step === "url" && (
               <>
                 <div>
@@ -942,9 +932,7 @@ function AddSheetModal({
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 :root {
   /* ─── Surface Layers (5 levels of depth) ─── */

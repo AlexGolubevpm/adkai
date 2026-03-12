@@ -8,7 +8,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
-import { Select, SelectOption } from "@/components/ui/select";
+import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
   TrendingDown,
