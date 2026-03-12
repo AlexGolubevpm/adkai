@@ -74,9 +74,9 @@ export default function SitesPage() {
     if (sortKey !== colKey)
       return <ArrowUpDown className="ml-1 inline h-3 w-3 text-[var(--foreground-subtle)] opacity-0 group-hover/th:opacity-100 transition-opacity" />;
     return sortDir === "asc" ? (
-      <ArrowUp className="ml-1 inline h-3 w-3 text-indigo-400" />
+      <ArrowUp className="ml-1 inline h-3 w-3 text-indigo-600" />
     ) : (
-      <ArrowDown className="ml-1 inline h-3 w-3 text-indigo-400" />
+      <ArrowDown className="ml-1 inline h-3 w-3 text-indigo-600" />
     );
   };
 
@@ -205,7 +205,7 @@ export default function SitesPage() {
                       </span>
                       <Link
                         href={`/sites/${w.externalId}`}
-                        className="font-medium text-[var(--foreground)] underline-offset-4 group-hover:text-indigo-400 transition-colors"
+                        className="font-medium text-[var(--foreground)] underline-offset-4 group-hover:text-indigo-600 transition-colors"
                       >
                         {w.domain}
                       </Link>
@@ -221,7 +221,7 @@ export default function SitesPage() {
                   <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
                     {formatNumber(w.clicks)}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums font-medium text-emerald-400">
+                  <TableCell className="text-right tabular-nums font-medium text-emerald-600">
                     {formatCurrency(w.brokerIncome)}
                   </TableCell>
                   <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">

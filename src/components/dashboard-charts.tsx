@@ -28,14 +28,14 @@ const chartConfig = [
   {
     title: "Revenue",
     dataKey: "revenue" as const,
-    color: "#22c55e",
+    color: "#059669",
     gradientId: "fillRevenue",
     formatter: (v: number) => `$${v.toLocaleString()}`,
   },
   {
     title: "Costs",
     dataKey: "costs" as const,
-    color: "#ef4444",
+    color: "#dc2626",
     gradientId: "fillCosts",
     formatter: (v: number) => `$${v.toLocaleString()}`,
   },
@@ -49,14 +49,14 @@ const chartConfig = [
   {
     title: "ROMI",
     dataKey: "romi" as const,
-    color: "#a78bfa",
+    color: "#7c3aed",
     gradientId: "fillRomi",
     formatter: (v: number) => `${v.toFixed(1)}%`,
   },
   {
     title: "Traffic",
     dataKey: "traffic" as const,
-    color: "#eab308",
+    color: "#d97706",
     gradientId: "fillTraffic",
     formatter: (v: number) => v.toLocaleString(),
   },
@@ -77,8 +77,18 @@ function ChartTooltipContent({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-1)] px-3 py-2 shadow-xl shadow-black/30">
-      <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-[var(--foreground-subtle)]">
+    <div
+      className="rounded-lg border px-3 py-2"
+      style={{
+        borderColor: "var(--border)",
+        background: "white",
+        boxShadow: "var(--shadow-lg)",
+      }}
+    >
+      <p
+        className="mb-1 text-[10px] font-medium uppercase tracking-wider"
+        style={{ color: "var(--foreground-subtle)" }}
+      >
         {label}
       </p>
       <p className="text-sm font-semibold tabular-nums" style={{ color }}>
@@ -98,23 +108,27 @@ export default function DashboardCharts({ data }: DashboardChartsProps) {
 
         return (
           <Card key={cfg.dataKey} className="overflow-hidden">
-            <CardContent className="p-5">
+            <CardContent className="px-6 py-5">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="text-xs font-medium text-[var(--foreground-subtle)] uppercase tracking-wider">
+                  <p
+                    className="text-[11px] font-medium uppercase tracking-wider"
+                    style={{ color: "var(--foreground-subtle)" }}
+                  >
                     {cfg.title}
                   </p>
-                  <p className="mt-1 text-xl font-bold tabular-nums" style={{ color: cfg.color }}>
+                  <p className="mt-1 text-xl font-bold tabular-nums" style={{ color: "var(--foreground)" }}>
                     {cfg.formatter(lastValue)}
                   </p>
                 </div>
                 {data.length > 1 && (
                   <span
-                    className={`text-xs font-medium tabular-nums rounded-md px-1.5 py-0.5 ${
+                    className="text-xs font-medium tabular-nums rounded-md px-2 py-0.5"
+                    style={
                       delta >= 0
-                        ? "bg-emerald-500/10 text-emerald-400"
-                        : "bg-red-500/10 text-red-400"
-                    }`}
+                        ? { background: "var(--success-light)", color: "var(--success)" }
+                        : { background: "var(--danger-light)", color: "var(--danger)" }
+                    }
                   >
                     {delta >= 0 ? "+" : ""}
                     {delta.toFixed(1)}%
@@ -126,13 +140,13 @@ export default function DashboardCharts({ data }: DashboardChartsProps) {
                   <AreaChart data={data}>
                     <defs>
                       <linearGradient id={cfg.gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={cfg.color} stopOpacity={0.15} />
+                        <stop offset="0%" stopColor={cfg.color} stopOpacity={0.08} />
                         <stop offset="100%" stopColor={cfg.color} stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid
                       strokeDasharray="3 3"
-                      stroke="var(--border)"
+                      stroke="var(--border-subtle)"
                       vertical={false}
                     />
                     <XAxis
@@ -174,10 +188,15 @@ export default function DashboardCharts({ data }: DashboardChartsProps) {
                       type="monotone"
                       dataKey={cfg.dataKey}
                       stroke={cfg.color}
-                      strokeWidth={2}
+                      strokeWidth={1.5}
                       fill={`url(#${cfg.gradientId})`}
                       dot={false}
-                      activeDot={{ r: 4, fill: cfg.color, stroke: "var(--surface-1)", strokeWidth: 2 }}
+                      activeDot={{
+                        r: 4,
+                        fill: cfg.color,
+                        stroke: "white",
+                        strokeWidth: 2,
+                      }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>

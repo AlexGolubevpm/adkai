@@ -105,11 +105,11 @@ function DeltaBadge({ delta, format = "currency" }: { delta: number; format?: "c
   );
 
   return delta > 0 ? (
-    <span className="flex items-center gap-0.5 text-xs font-medium text-emerald-400">
+    <span className="flex items-center gap-0.5 text-xs font-medium text-emerald-600">
       <ChevronUp className="h-3 w-3" />+{formatted}
     </span>
   ) : (
-    <span className="flex items-center gap-0.5 text-xs font-medium text-red-400">
+    <span className="flex items-center gap-0.5 text-xs font-medium text-red-600">
       <ChevronDown className="h-3 w-3" />-{formatted}
     </span>
   );
@@ -148,7 +148,7 @@ function RangeSlider({
         />
         {/* Zero line indicator */}
         <div
-          className="pointer-events-none absolute top-1/2 h-3 w-0.5 -translate-y-1/2 bg-white/20 rounded"
+          className="pointer-events-none absolute top-1/2 h-3 w-0.5 -translate-y-1/2 bg-gray-400/40 rounded"
           style={{ left: `${((-min) / (max - min)) * 100}%` }}
         />
       </div>
@@ -156,7 +156,7 @@ function RangeSlider({
         <span
           className={cn(
             "w-14 text-right text-sm font-semibold tabular-nums",
-            value > 0 ? "text-emerald-400" : value < 0 ? "text-red-400" : "text-[var(--foreground-muted)]"
+            value > 0 ? "text-emerald-600" : value < 0 ? "text-red-600" : "text-[var(--foreground-muted)]"
           )}
         >
           {value > 0 ? "+" : ""}{value}%
@@ -363,7 +363,7 @@ export default function ForecastPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-500/10">
-                <Zap className="h-3.5 w-3.5 text-indigo-400" />
+                <Zap className="h-3.5 w-3.5 text-indigo-600" />
               </div>
               <CardTitle className="text-sm">Scenario Controls</CardTitle>
             </div>
@@ -523,7 +523,7 @@ export default function ForecastPage() {
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
                   <XAxis
                     dataKey="cpmLabel"
                     tick={{ fontSize: 10, fill: "var(--foreground-subtle)" }}
@@ -572,13 +572,13 @@ export default function ForecastPage() {
                   {/* Current CPM reference */}
                   <ReferenceLine
                     x={`$${(totals.avgRealCpm * currentCpmMult).toFixed(2)}`}
-                    stroke="rgba(255,255,255,0.3)"
+                    stroke="var(--foreground-subtle)"
                     strokeDasharray="4 4"
                     label={{
                       value: "Now",
                       position: "top",
                       fontSize: 10,
-                      fill: "rgba(255,255,255,0.4)",
+                      fill: "var(--foreground-subtle)",
                     }}
                   />
 
@@ -642,7 +642,7 @@ export default function ForecastPage() {
                     {totals.avgRealCpm > 0 ? `$${totals.avgRealCpm.toFixed(3)}` : "—"}
                   </div>
                   {hasScenario && (
-                    <div className="text-sm text-indigo-400 mt-0.5">
+                    <div className="text-sm text-indigo-600 mt-0.5">
                       → ${proj.avgRealCpm.toFixed(3)} projected
                     </div>
                   )}
@@ -686,7 +686,7 @@ export default function ForecastPage() {
                             </div>
                             <div className={cn(
                               "text-[10px]",
-                              isCurrent ? "text-emerald-400" : "text-[var(--foreground-subtle)]"
+                              isCurrent ? "text-emerald-600" : "text-[var(--foreground-subtle)]"
                             )}>
                               {isCurrent ? "✓ Achieved" : `Gap: ${((targetCpm / currentCpm - 1) * 100).toFixed(0)}%`}
                             </div>
@@ -742,10 +742,10 @@ export default function ForecastPage() {
                 .sort((a, b) => b.revenue - a.revenue)
                 .map((site) => {
                   const bundleColor =
-                    site.bundle.code === "gays" ? "text-blue-400" :
-                    site.bundle.code === "trans" ? "text-pink-400" :
-                    site.bundle.code === "hentai" ? "text-purple-400" :
-                    site.bundle.code === "jav" ? "text-orange-400" :
+                    site.bundle.code === "gays" ? "text-blue-600" :
+                    site.bundle.code === "trans" ? "text-pink-600" :
+                    site.bundle.code === "hentai" ? "text-purple-600" :
+                    site.bundle.code === "jav" ? "text-orange-600" :
                     "text-[var(--foreground-muted)]";
 
                   return (
@@ -763,18 +763,18 @@ export default function ForecastPage() {
                       </TableCell>
                       {hasScenario && (
                         <TableCell className="text-right tabular-nums">
-                          <span className="text-indigo-400 font-medium">
+                          <span className="text-indigo-600 font-medium">
                             {site.projCpm > 0 ? `$${site.projCpm.toFixed(3)}` : "—"}
                           </span>
                         </TableCell>
                       )}
-                      <TableCell className="text-right tabular-nums font-medium text-emerald-400">
+                      <TableCell className="text-right tabular-nums font-medium text-emerald-600">
                         {formatCurrency(site.revenue)}
                       </TableCell>
                       {hasScenario && (
                         <TableCell className="text-right">
                           <div className="flex flex-col items-end">
-                            <span className="tabular-nums font-medium text-indigo-400">
+                            <span className="tabular-nums font-medium text-indigo-600">
                               {formatCurrency(site.projRevenue)}
                             </span>
                             <DeltaBadge delta={site.revenueDelta} format="currency" />
@@ -784,8 +784,8 @@ export default function ForecastPage() {
                       <TableCell className="text-right tabular-nums">
                         <span className={cn(
                           "font-medium",
-                          site.romi >= 100 ? "text-emerald-400" :
-                          site.romi >= 0 ? "text-yellow-400" : "text-red-400"
+                          site.romi >= 100 ? "text-emerald-600" :
+                          site.romi >= 0 ? "text-amber-600" : "text-red-600"
                         )}>
                           {formatPercent(site.romi)}
                         </span>
@@ -795,8 +795,8 @@ export default function ForecastPage() {
                           <div className="flex flex-col items-end">
                             <span className={cn(
                               "tabular-nums font-medium",
-                              site.projRomi >= 100 ? "text-emerald-400" :
-                              site.projRomi >= 0 ? "text-yellow-400" : "text-red-400"
+                              site.projRomi >= 100 ? "text-emerald-600" :
+                              site.projRomi >= 0 ? "text-amber-600" : "text-red-600"
                             )}>
                               {formatPercent(site.projRomi)}
                             </span>

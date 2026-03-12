@@ -56,10 +56,10 @@ export default function PeriodFilter({ value, onChange }: PeriodFilterProps) {
       <button
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-all duration-150",
+          "flex items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-all cursor-pointer",
           open
-            ? "border-indigo-500/50 bg-[var(--surface-2)] text-[var(--foreground)] shadow-sm shadow-indigo-500/10"
-            : "border-[var(--border)] bg-[var(--surface-1)] text-[var(--foreground-muted)] hover:border-[var(--border-hover)] hover:text-[var(--foreground)]"
+            ? "border-[var(--primary)] bg-[var(--primary-light)] text-[var(--primary)]"
+            : "border-[var(--border)] bg-white text-[var(--foreground-muted)] hover:border-[var(--border-hover)] hover:text-[var(--foreground)]"
         )}
       >
         <Calendar className="h-3.5 w-3.5" />
@@ -73,29 +73,54 @@ export default function PeriodFilter({ value, onChange }: PeriodFilterProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1.5 w-56 rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-1.5 shadow-2xl shadow-black/40 animate-fade-in">
+        <div
+          className="absolute right-0 z-50 mt-1.5 w-56 rounded-xl border p-1.5 animate-fade-in"
+          style={{
+            borderColor: "var(--border)",
+            background: "white",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
           {presets.map((preset) => (
             <button
               key={preset.value}
               onClick={() => handleSelect(preset.value)}
-              className={cn(
-                "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-100",
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors cursor-pointer"
+              style={
                 value.preset === preset.value
-                  ? "bg-indigo-500/10 text-indigo-400"
-                  : "text-[var(--foreground-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
-              )}
+                  ? { background: "var(--primary-light)", color: "var(--primary)" }
+                  : { color: "var(--foreground-muted)" }
+              }
+              onMouseEnter={(e) => {
+                if (value.preset !== preset.value) {
+                  e.currentTarget.style.background = "var(--surface-2)";
+                  e.currentTarget.style.color = "var(--foreground)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (value.preset !== preset.value) {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "var(--foreground-muted)";
+                }
+              }}
             >
               {preset.label}
               {value.preset === preset.value && (
-                <Check className="h-3.5 w-3.5 text-indigo-400" />
+                <Check className="h-3.5 w-3.5" style={{ color: "var(--primary)" }} />
               )}
             </button>
           ))}
 
           {value.preset === "custom" && (
-            <div className="mt-1.5 space-y-2 border-t border-[var(--border)] px-3 pt-3 pb-2">
+            <div
+              className="mt-1.5 space-y-2 px-3 pt-3 pb-2"
+              style={{ borderTop: "1px solid var(--border)" }}
+            >
               <div>
-                <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[var(--foreground-subtle)]">
+                <label
+                  className="mb-1 block text-[10px] font-medium uppercase tracking-wider"
+                  style={{ color: "var(--foreground-subtle)" }}
+                >
                   From
                 </label>
                 <input
@@ -104,11 +129,19 @@ export default function PeriodFilter({ value, onChange }: PeriodFilterProps) {
                   onChange={(e) =>
                     onChange({ ...value, from: e.target.value })
                   }
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-0)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full rounded-lg border px-3 py-1.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-[var(--ring)]"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--foreground)",
+                    background: "white",
+                  }}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-[var(--foreground-subtle)]">
+                <label
+                  className="mb-1 block text-[10px] font-medium uppercase tracking-wider"
+                  style={{ color: "var(--foreground-subtle)" }}
+                >
                   To
                 </label>
                 <input
@@ -117,7 +150,12 @@ export default function PeriodFilter({ value, onChange }: PeriodFilterProps) {
                   onChange={(e) =>
                     onChange({ ...value, to: e.target.value })
                   }
-                  className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface-0)] px-3 py-1.5 text-sm text-[var(--foreground)] outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full rounded-lg border px-3 py-1.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-[var(--ring)]"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--foreground)",
+                    background: "white",
+                  }}
                 />
               </div>
             </div>

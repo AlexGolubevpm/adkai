@@ -9,9 +9,17 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     <select
       ref={ref}
       className={cn(
-        "flex h-9 w-full appearance-none rounded-lg border border-[var(--border)] bg-[var(--surface-0)] px-3 py-2 pr-8 text-sm text-[var(--foreground)] ring-offset-[var(--background)] placeholder:text-[var(--foreground-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
+        "flex h-9 w-full appearance-none rounded-lg border border-[var(--border)] bg-white px-3 py-1 pr-9 text-sm text-[var(--foreground)] transition-colors cursor-pointer",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
+      style={{
+        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+        backgroundPosition: "right 8px center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "20px",
+      }}
       {...props}
     >
       {children}
@@ -24,11 +32,7 @@ const SelectOption = React.forwardRef<
   HTMLOptionElement,
   React.OptionHTMLAttributes<HTMLOptionElement>
 >(({ className, ...props }, ref) => (
-  <option
-    ref={ref}
-    className={cn("bg-[var(--surface-1)] text-[var(--foreground)]", className)}
-    {...props}
-  />
+  <option ref={ref} className={cn("", className)} {...props} />
 ));
 SelectOption.displayName = "SelectOption";
 

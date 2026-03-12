@@ -77,10 +77,10 @@ interface SyncResult {
 // ─── Constants ───────────────────────────────────────────────────
 
 const BUNDLE_COLORS: Record<string, string> = {
-  Gays: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  Trans: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-  Hentai: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  JAV: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  Gays: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+  Trans: "bg-pink-500/10 text-pink-600 border-pink-500/20",
+  Hentai: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+  JAV: "bg-orange-500/10 text-orange-600 border-orange-500/20",
 };
 
 // ─── Component ───────────────────────────────────────────────────
@@ -215,7 +215,7 @@ export default function CostsPage() {
             {lastSync ? (
               <>
                 <div className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </div>
                 Last synced: {formatRelativeTime(lastSync)}
@@ -283,8 +283,8 @@ export default function CostsPage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                    <span className="text-sm font-medium text-emerald-400">Sync Complete</span>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-emerald-600">Sync Complete</span>
                   </div>
                   <Button variant="ghost" size="sm" onClick={() => setSyncResults(null)}>
                     <X className="h-3.5 w-3.5" />
@@ -295,12 +295,12 @@ export default function CostsPage() {
                     <div key={r.configName} className="text-xs text-[var(--foreground-muted)]">
                       <span className="font-medium text-[var(--foreground)]">{r.configName}</span>
                       {" — "}
-                      <span className="text-emerald-400">{r.matched} matched</span>
+                      <span className="text-emerald-600">{r.matched} matched</span>
                       {r.unmatched > 0 && (
-                        <span className="text-yellow-400"> / {r.unmatched} unmatched</span>
+                        <span className="text-amber-600"> / {r.unmatched} unmatched</span>
                       )}
                       {r.errors > 0 && (
-                        <span className="text-red-400"> / {r.errors} errors</span>
+                        <span className="text-red-600"> / {r.errors} errors</span>
                       )}
                     </div>
                   ))}
@@ -390,7 +390,7 @@ export default function CostsPage() {
                       <TableCell className="tabular-nums text-[var(--foreground-muted)]">
                         {entry.date}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-medium text-red-400">
+                      <TableCell className="text-right tabular-nums font-medium text-red-600">
                         {formatCurrency(entry.cost)}
                       </TableCell>
                       <TableCell>
@@ -454,9 +454,9 @@ export default function CostsPage() {
                             {config.lastSyncAt ? (
                               <div className="flex items-center gap-1">
                                 {config.lastSyncStatus === "success" ? (
-                                  <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                                  <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                                 ) : (
-                                  <XCircle className="h-3 w-3 text-red-400" />
+                                  <XCircle className="h-3 w-3 text-red-600" />
                                 )}
                                 <span className="text-[10px] text-[var(--foreground-subtle)]">
                                   {formatRelativeTime(config.lastSyncAt)}
@@ -466,7 +466,7 @@ export default function CostsPage() {
                               <span className="text-[10px] text-[var(--foreground-subtle)]">Never synced</span>
                             )}
                             {config.lastSyncError && (
-                              <span className="text-[10px] text-red-400 truncate max-w-[200px]">
+                              <span className="text-[10px] text-red-600 truncate max-w-[200px]">
                                 {config.lastSyncError}
                               </span>
                             )}
@@ -488,7 +488,7 @@ export default function CostsPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteConfig(config.id)}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-red-600 hover:text-red-300"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
@@ -511,7 +511,7 @@ export default function CostsPage() {
             <Card className="border-yellow-500/20">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
                   <CardTitle>Unmatched Entries</CardTitle>
                 </div>
                 <p className="text-xs text-[var(--foreground-muted)]">
@@ -535,10 +535,10 @@ export default function CostsPage() {
                           <TableCell className="tabular-nums text-[var(--foreground-subtle)]">
                             #{entry.row}
                           </TableCell>
-                          <TableCell className="font-medium text-yellow-400">
+                          <TableCell className="font-medium text-amber-600">
                             {entry.site}
                           </TableCell>
-                          <TableCell className="text-right tabular-nums font-medium text-red-400">
+                          <TableCell className="text-right tabular-nums font-medium text-red-600">
                             {formatCurrency(entry.cost)}
                           </TableCell>
                           <TableCell className="text-xs text-[var(--foreground-muted)]">
@@ -688,7 +688,7 @@ function AddSheetModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -730,7 +730,7 @@ function AddSheetModal({
                   </p>
                 </div>
                 {previewError && (
-                  <div className="flex items-center gap-2 text-xs text-red-400">
+                  <div className="flex items-center gap-2 text-xs text-red-600">
                     <XCircle className="h-3.5 w-3.5" />
                     {previewError}
                   </div>
@@ -867,13 +867,13 @@ function AddSheetModal({
                                   key={ci}
                                   className={`px-3 py-2 text-left ${
                                     isSite
-                                      ? "text-blue-400"
+                                      ? "text-blue-600"
                                       : isCost
-                                      ? "text-red-400"
+                                      ? "text-red-600"
                                       : isDate
-                                      ? "text-amber-400"
+                                      ? "text-amber-600"
                                       : isUsers
-                                      ? "text-emerald-400"
+                                      ? "text-emerald-600"
                                       : "text-[var(--foreground-subtle)]"
                                   }`}
                                 >
@@ -905,7 +905,7 @@ function AddSheetModal({
                 )}
 
                 {error && (
-                  <div className="flex items-center gap-2 text-xs text-red-400">
+                  <div className="flex items-center gap-2 text-xs text-red-600">
                     <XCircle className="h-3.5 w-3.5" />
                     {error}
                   </div>
