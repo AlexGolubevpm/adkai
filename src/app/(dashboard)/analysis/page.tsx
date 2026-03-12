@@ -37,9 +37,9 @@ interface AnalysisRun {
 
 const statusConfig = {
   pending: { label: "Pending", icon: Clock, variant: "secondary" as const, color: "text-[var(--foreground-muted)]" },
-  running: { label: "Running", icon: Loader2, variant: "primary" as const, color: "text-indigo-400" },
-  completed: { label: "Completed", icon: CheckCircle2, variant: "healthy" as const, color: "text-emerald-400" },
-  failed: { label: "Failed", icon: AlertCircle, variant: "critical" as const, color: "text-red-400" },
+  running: { label: "Running", icon: Loader2, variant: "primary" as const, color: "text-indigo-600" },
+  completed: { label: "Completed", icon: CheckCircle2, variant: "healthy" as const, color: "text-emerald-600" },
+  failed: { label: "Failed", icon: AlertCircle, variant: "critical" as const, color: "text-red-600" },
 };
 
 export default function AnalysisPage() {
@@ -111,7 +111,7 @@ export default function AnalysisPage() {
           <Card className="overflow-hidden">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-indigo-400" />
+                <Brain className="h-5 w-5 text-indigo-600" />
                 <CardTitle>AI Analysis Engine</CardTitle>
               </div>
               <p className="text-xs text-[var(--foreground-muted)]">
@@ -123,7 +123,7 @@ export default function AnalysisPage() {
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="relative">
                     <div className="h-16 w-16 rounded-full border-2 border-indigo-500/20 flex items-center justify-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-indigo-400" />
+                      <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
                     </div>
                     <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 animate-spin" style={{ animationDuration: "2s" }} />
                   </div>
@@ -137,7 +137,7 @@ export default function AnalysisPage() {
               {!isRunning && !result && (
                 <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
                   <div className="h-16 w-16 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                    <Brain className="h-8 w-8 text-indigo-400" />
+                    <Brain className="h-8 w-8 text-indigo-600" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-[var(--foreground)]">Ready to analyze</p>
@@ -151,8 +151,8 @@ export default function AnalysisPage() {
               {!isRunning && result && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                    <span className="text-sm font-medium text-emerald-400">Analysis complete</span>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-emerald-600">Analysis complete</span>
                   </div>
                   <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-0)] p-4">
                     <pre className="text-sm text-[var(--foreground-muted)] whitespace-pre-wrap font-sans leading-relaxed">

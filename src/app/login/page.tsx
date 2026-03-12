@@ -38,19 +38,41 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: "var(--background)" }}
+    >
       <div className="w-full max-w-sm animate-fade-in">
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-8 shadow-2xl shadow-black/20">
+        <div
+          className="rounded-xl border p-8"
+          style={{
+            borderColor: "var(--border)",
+            background: "white",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
           {/* Logo */}
           <div className="flex items-center gap-2.5 mb-6">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500 shadow-sm shadow-indigo-500/25">
+            <div
+              className="flex h-9 w-9 items-center justify-center rounded-lg"
+              style={{
+                background: "var(--primary)",
+                boxShadow: "0 1px 3px rgba(99, 102, 241, 0.3)",
+              }}
+            >
               <Activity className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-[var(--foreground)] tracking-tight">
+              <h1
+                className="text-lg font-bold tracking-tight"
+                style={{ color: "var(--foreground)" }}
+              >
                 AdKai
               </h1>
-              <p className="text-[10px] font-medium text-[var(--foreground-subtle)] uppercase tracking-widest">
+              <p
+                className="text-[10px] font-medium uppercase tracking-widest"
+                style={{ color: "var(--foreground-subtle)" }}
+              >
                 Analytics Platform
               </p>
             </div>
@@ -58,42 +80,70 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-[var(--foreground-muted)] mb-1.5">
+              <label
+                className="block text-xs font-medium mb-1.5"
+                style={{ color: "var(--foreground-muted)" }}
+              >
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface-0)] border border-[var(--border)] rounded-lg text-[var(--foreground)] placeholder-[var(--foreground-subtle)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                className="w-full px-3 py-2 border rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                style={{
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                  background: "white",
+                }}
                 placeholder="admin@adkai.com"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[var(--foreground-muted)] mb-1.5">
+              <label
+                className="block text-xs font-medium mb-1.5"
+                style={{ color: "var(--foreground-muted)" }}
+              >
                 Password
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 bg-[var(--surface-0)] border border-[var(--border)] rounded-lg text-[var(--foreground)] placeholder-[var(--foreground-subtle)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                className="w-full px-3 py-2 border rounded-lg text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                style={{
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                  background: "white",
+                }}
                 placeholder="Enter your password"
                 required
               />
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2">
-                <p className="text-red-400 text-xs">{error}</p>
+              <div
+                className="rounded-lg px-3 py-2"
+                style={{
+                  background: "var(--danger-light)",
+                  border: "1px solid var(--danger-muted)",
+                }}
+              >
+                <p className="text-xs" style={{ color: "var(--danger)" }}>
+                  {error}
+                </p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 disabled:hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-all duration-150 shadow-sm shadow-indigo-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full py-2.5 text-white rounded-lg text-sm font-medium transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+              style={{
+                background: "var(--primary)",
+                boxShadow: "0 1px 3px rgba(99, 102, 241, 0.3)",
+              }}
             >
               {loading ? (
                 <>

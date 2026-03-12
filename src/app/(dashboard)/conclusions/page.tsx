@@ -67,10 +67,10 @@ const BEST_FORMATS: ConclusionCard[] = [
 ];
 
 const BUNDLE_COLORS: Record<string, string> = {
-  Gays: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  Trans: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-  Hentai: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  JAV: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  Gays: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+  Trans: "bg-pink-500/10 text-pink-600 border-pink-500/20",
+  Hentai: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+  JAV: "bg-orange-500/10 text-orange-600 border-orange-500/20",
 };
 
 function ConclusionSection({
@@ -85,7 +85,7 @@ function ConclusionSection({
   items: ConclusionCard[];
 }) {
   const accentColor = accent === "red" ? "border-red-500/20" : "border-emerald-500/20";
-  const iconColor = accent === "red" ? "text-red-400" : "text-emerald-400";
+  const iconColor = accent === "red" ? "text-red-600" : "text-emerald-600";
 
   return (
     <div className="space-y-3">
@@ -121,7 +121,7 @@ function ConclusionSection({
                 <p
                   className={cn(
                     "text-xl font-bold tabular-nums mt-0.5",
-                    accent === "red" ? "text-red-400" : "text-emerald-400"
+                    accent === "red" ? "text-red-600" : "text-emerald-600"
                   )}
                 >
                   {item.metricValue}
@@ -130,7 +130,7 @@ function ConclusionSection({
               <div
                 className={cn(
                   "flex items-center gap-1 text-xs font-medium tabular-nums",
-                  item.delta >= 0 ? "text-emerald-400" : "text-red-400"
+                  item.delta >= 0 ? "text-emerald-600" : "text-red-600"
                 )}
               >
                 {item.delta >= 0 ? (

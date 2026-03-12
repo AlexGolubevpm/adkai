@@ -65,7 +65,7 @@ interface WebsiteDetail {
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-1)] px-3 py-2 text-xs shadow-xl shadow-black/30">
+    <div className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-xs" style={{ boxShadow: "var(--shadow-lg)" }}>
       <p className="font-medium text-[var(--foreground-subtle)] mb-1">{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} className="font-semibold tabular-nums" style={{ color: p.color }}>
@@ -277,7 +277,7 @@ export default function SiteDetailPage() {
                         <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
                           {formatNumber(spot.clicks)}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums font-medium text-emerald-400">
+                        <TableCell className="text-right tabular-nums font-medium text-emerald-600">
                           {formatCurrency(spot.brokerIncome)}
                         </TableCell>
                         <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
@@ -334,7 +334,7 @@ export default function SiteDetailPage() {
                       <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
                         {formatNumber(d.clicks)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-medium text-emerald-400">
+                      <TableCell className="text-right tabular-nums font-medium text-emerald-600">
                         {formatCurrency(d.brokerIncome)}
                       </TableCell>
                       <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">

@@ -199,7 +199,7 @@ export default function DashboardPage() {
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs">
                         <span className="text-[var(--foreground-subtle)]">Income</span>
-                        <span className="font-medium tabular-nums text-emerald-400">
+                        <span className="font-medium tabular-nums text-emerald-600">
                           {formatCurrency(adType.broker_income)}
                         </span>
                       </div>
@@ -277,7 +277,7 @@ export default function DashboardPage() {
                         </span>
                         <Link
                           href={`/sites/${w.externalId}`}
-                          className="font-medium text-[var(--foreground)] underline-offset-4 group-hover:text-indigo-400 transition-colors"
+                          className="font-medium text-[var(--foreground)] underline-offset-4 group-hover:text-indigo-600 transition-colors"
                         >
                           {w.domain}
                         </Link>
@@ -292,7 +292,7 @@ export default function DashboardPage() {
                     <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
                       {formatNumber(w.clicks)}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums font-medium text-emerald-400">
+                    <TableCell className="text-right tabular-nums font-medium text-emerald-600">
                       {formatCurrency(w.brokerIncome)}
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
