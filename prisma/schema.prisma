@@ -242,6 +242,27 @@ model AnalysisRun {
   @@map("analysis_runs")
 }
 
+model GoogleSheetConfig {
+  id              String   @id @default(cuid())
+  name            String
+  spreadsheetId   String   @map("spreadsheet_id")
+  sheetName       String   @default("Sheet1") @map("sheet_name")
+  siteColumn      String   @default("A") @map("site_column")
+  costColumn      String   @default("B") @map("cost_column")
+  dateColumn      String   @default("C") @map("date_column")
+  usersColumn     String?  @map("users_column")
+  headerRow       Int      @default(1) @map("header_row")
+  dataStartRow    Int      @default(2) @map("data_start_row")
+  isActive        Boolean  @default(true) @map("is_active")
+  lastSyncAt      DateTime? @map("last_sync_at")
+  lastSyncStatus  String?  @map("last_sync_status")
+  lastSyncError   String?  @map("last_sync_error")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("google_sheet_configs")
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
