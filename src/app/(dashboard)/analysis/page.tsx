@@ -2,18 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
 import {
   Brain,
   Play,
@@ -73,10 +64,7 @@ export default function AnalysisPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
-            Analysis
-          </h1>
-          <p className="mt-0.5 text-sm text-[var(--foreground-muted)]">
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--foreground-muted)" }}>
             AI-powered insights for your ad network
           </p>
         </div>
@@ -107,18 +95,21 @@ export default function AnalysisPage() {
         </TabsList>
 
         <TabsContent value="run">
-          {/* Status card */}
-          <Card className="overflow-hidden">
-            <CardHeader>
+          {/* Status section */}
+          <div className="section-panel">
+            <div className="section-panel-header">
               <div className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-indigo-600" />
-                <CardTitle>AI Analysis Engine</CardTitle>
+                <h2 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
+                  AI Analysis Engine
+                </h2>
               </div>
-              <p className="text-xs text-[var(--foreground-muted)]">
+            </div>
+            <div className="section-panel-content">
+              <p className="text-xs text-[var(--foreground-muted)] mb-4">
                 Analyze your data using AI to find patterns, anomalies, and optimization opportunities.
               </p>
-            </CardHeader>
-            <CardContent>
+
               {isRunning && (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="relative">
@@ -161,57 +152,57 @@ export default function AnalysisPage() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="history">
           {history && history.length > 0 ? (
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Completed</TableHead>
-                    <TableHead>Preview</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+            <div className="data-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Completed</th>
+                    <th>Preview</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {history.map((run) => {
                     const cfg = statusConfig[run.status];
                     const StatusIcon = cfg.icon;
                     return (
-                      <TableRow key={run.id}>
-                        <TableCell>
+                      <tr key={run.id}>
+                        <td>
                           <Badge variant={cfg.variant} className="gap-1">
                             <StatusIcon className={`h-3 w-3 ${run.status === "running" ? "animate-spin" : ""}`} />
                             {cfg.label}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="tabular-nums text-[var(--foreground-muted)] text-xs">
+                        </td>
+                        <td className="tabular-nums text-[var(--foreground-muted)] text-xs">
                           {new Date(run.createdAt).toLocaleString()}
-                        </TableCell>
-                        <TableCell className="tabular-nums text-[var(--foreground-muted)] text-xs">
-                          {run.completedAt ? new Date(run.completedAt).toLocaleString() : "—"}
-                        </TableCell>
-                        <TableCell className="text-xs text-[var(--foreground-subtle)] max-w-[300px] truncate">
-                          {run.result?.slice(0, 80) ?? "—"}
-                        </TableCell>
-                      </TableRow>
+                        </td>
+                        <td className="tabular-nums text-[var(--foreground-muted)] text-xs">
+                          {run.completedAt ? new Date(run.completedAt).toLocaleString() : "\u2014"}
+                        </td>
+                        <td className="text-xs text-[var(--foreground-subtle)]" style={{ maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {run.result?.slice(0, 80) ?? "\u2014"}
+                        </td>
+                      </tr>
                     );
                   })}
-                </TableBody>
-              </Table>
-            </Card>
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-16 text-[var(--foreground-subtle)]">
+            <div className="section-panel">
+              <div className="section-panel-content flex flex-col items-center justify-center py-16 text-[var(--foreground-subtle)]">
                 <FileText className="h-10 w-10 opacity-30 mb-3" />
                 <p className="text-sm">No analysis history yet</p>
                 <p className="text-xs mt-1">Run your first analysis to see results here</p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </TabsContent>
       </Tabs>

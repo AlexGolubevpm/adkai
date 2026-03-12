@@ -3,16 +3,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatNumber, formatCurrency } from "@/lib/utils";
 import { useApi, periodToDateRange } from "@/lib/hooks";
@@ -25,6 +15,8 @@ import {
   Search,
   Globe,
   ExternalLink,
+  DollarSign,
+  Users,
 } from "lucide-react";
 
 interface WebsiteRow {
@@ -72,11 +64,11 @@ export default function SitesPage() {
 
   const SortIcon = ({ colKey }: { colKey: SortKey }) => {
     if (sortKey !== colKey)
-      return <ArrowUpDown className="ml-1 inline h-3 w-3 text-[var(--foreground-subtle)] opacity-0 group-hover/th:opacity-100 transition-opacity" />;
+      return <ArrowUpDown className="ml-1 inline h-3 w-3 opacity-0 group-hover/th:opacity-100 transition-opacity" style={{ color: "var(--foreground-subtle)" }} />;
     return sortDir === "asc" ? (
-      <ArrowUp className="ml-1 inline h-3 w-3 text-indigo-600" />
+      <ArrowUp className="ml-1 inline h-3 w-3" style={{ color: "var(--primary)" }} />
     ) : (
-      <ArrowDown className="ml-1 inline h-3 w-3 text-indigo-600" />
+      <ArrowDown className="ml-1 inline h-3 w-3" style={{ color: "var(--primary)" }} />
     );
   };
 
@@ -104,18 +96,17 @@ export default function SitesPage() {
     return copy;
   }, [websitesData, search, sortKey, sortDir]);
 
-  const columns: { key: SortKey; label: string; align?: string }[] = [
+  const columns: { key: SortKey; label: string }[] = [
     { key: "domain", label: "Website" },
-    { key: "hits", label: "Hits", align: "text-right" },
-    { key: "impressions", label: "Impressions", align: "text-right" },
-    { key: "clicks", label: "Clicks", align: "text-right" },
-    { key: "brokerIncome", label: "Income", align: "text-right" },
-    { key: "ctr", label: "CTR", align: "text-right" },
-    { key: "fillRate", label: "Fill Rate", align: "text-right" },
-    { key: "realCpm", label: "eCPM", align: "text-right" },
+    { key: "hits", label: "Hits" },
+    { key: "impressions", label: "Impressions" },
+    { key: "clicks", label: "Clicks" },
+    { key: "brokerIncome", label: "Income" },
+    { key: "ctr", label: "CTR" },
+    { key: "fillRate", label: "Fill Rate" },
+    { key: "realCpm", label: "eCPM" },
   ];
 
-  // Totals row
   const totals = useMemo(() => {
     if (!sorted.length) return null;
     return sorted.reduce(
@@ -134,124 +125,224 @@ export default function SitesPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-5"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Sites</h1>
-          <p className="mt-0.5 text-sm text-[var(--foreground-muted)]">
-            Live data from AdSpyGlass
-          </p>
+      {/* Toolbar */}
+      <div
+        className="flex items-center justify-between"
+        style={{ marginBottom: "var(--section-gap)" }}
+      >
+        <div className="flex items-center gap-3">
+          <PeriodFilter value={period} onChange={setPeriod} />
         </div>
-        <PeriodFilter value={period} onChange={setPeriod} />
       </div>
 
-      {/* Search & stats bar */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--foreground-subtle)]" />
-          <Input
-            className="pl-9 bg-[var(--surface-1)]"
-            placeholder="Search sites..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        {websitesData && (
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">
-              <Globe className="mr-1 h-3 w-3" />
-              {sorted.length} of {websitesData.length}
-            </Badge>
-            {totals && (
-              <Badge variant="healthy">
-                {formatCurrency(totals.brokerIncome)} total
-              </Badge>
-            )}
+      {/* Summary KPIs */}
+      {websitesData && totals && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 16,
+            marginBottom: "var(--section-gap)",
+          }}
+        >
+          <div className="kpi-card">
+            <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+              <div className="kpi-icon" style={{ background: "var(--kpi-blue-bg)", color: "var(--kpi-blue)" }}>
+                <Globe style={{ width: 18, height: 18 }} />
+              </div>
+            </div>
+            <div className="kpi-value">{websitesData.length}</div>
+            <div className="kpi-label">Total Sites</div>
           </div>
-        )}
-      </div>
+          <div className="kpi-card">
+            <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+              <div className="kpi-icon" style={{ background: "var(--kpi-green-bg)", color: "var(--kpi-green)" }}>
+                <DollarSign style={{ width: 18, height: 18 }} />
+              </div>
+            </div>
+            <div className="kpi-value">{formatCurrency(totals.brokerIncome)}</div>
+            <div className="kpi-label">Total Income</div>
+          </div>
+          <div className="kpi-card">
+            <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+              <div className="kpi-icon" style={{ background: "var(--kpi-cyan-bg)", color: "var(--kpi-cyan)" }}>
+                <Users style={{ width: 18, height: 18 }} />
+              </div>
+            </div>
+            <div className="kpi-value">{formatNumber(totals.hits)}</div>
+            <div className="kpi-label">Total Hits</div>
+          </div>
+        </div>
+      )}
 
+      {/* Data Table */}
       {loading ? (
         <TableSkeleton rows={12} cols={8} />
       ) : (
-        <Card>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columns.map((col) => (
-                  <TableHead
-                    key={col.key}
-                    className={cn(
-                      "cursor-pointer select-none whitespace-nowrap group/th",
-                      col.align
-                    )}
-                    onClick={() => handleSort(col.key)}
-                  >
-                    {col.label}
-                    <SortIcon colKey={col.key} />
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sorted.map((w, idx) => (
-                <TableRow key={w.externalId} className="group">
-                  <TableCell>
-                    <div className="flex items-center gap-2.5">
-                      <span className="flex h-5 w-5 items-center justify-center rounded text-[9px] font-bold tabular-nums text-[var(--foreground-subtle)] bg-[var(--surface-2)]">
-                        {idx + 1}
-                      </span>
-                      <Link
-                        href={`/sites/${w.externalId}`}
-                        className="font-medium text-[var(--foreground)] underline-offset-4 group-hover:text-indigo-600 transition-colors"
-                      >
-                        {w.domain}
-                      </Link>
-                      <ExternalLink className="h-3 w-3 text-[var(--foreground-subtle)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                    {formatNumber(w.hits)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                    {formatNumber(w.impressions)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                    {formatNumber(w.clicks)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums font-medium text-emerald-600">
-                    {formatCurrency(w.brokerIncome)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                    {w.ctr.toFixed(2)}%
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                    {w.fillRate.toFixed(2)}%
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                    ${w.realCpm.toFixed(4)}
-                  </TableCell>
-                </TableRow>
-              ))}
+        <div className="data-table-container">
+          <div className="data-table-toolbar">
+            <div className="flex items-center gap-3">
+              <Globe style={{ width: 16, height: 16, color: "var(--kpi-blue)" }} />
+              <span className="section-heading">All Websites</span>
+              <Badge variant="secondary">
+                {sorted.length} of {websitesData?.length ?? 0}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-3">
+              <div
+                className="flex items-center gap-2"
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid var(--border)",
+                  background: "var(--surface-1)",
+                }}
+              >
+                <Search style={{ width: 14, height: 14, color: "var(--foreground-subtle)" }} />
+                <input
+                  type="text"
+                  placeholder="Search sites..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{
+                    border: "none",
+                    outline: "none",
+                    background: "transparent",
+                    fontSize: "var(--text-sm)",
+                    color: "var(--foreground)",
+                    width: 160,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
 
-              {sorted.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-32 text-center">
-                    <div className="flex flex-col items-center gap-2 text-[var(--foreground-subtle)]">
-                      <Globe className="h-8 w-8 opacity-40" />
-                      <p className="text-sm">No sites found</p>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead style={{ background: "var(--surface-1)" }}>
+                <tr>
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      className="group/th"
+                      onClick={() => handleSort(col.key)}
+                      style={{
+                        padding: "12px 16px",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                        color: "var(--foreground-subtle)",
+                        textAlign: col.key === "domain" ? "left" : "right",
+                        borderBottom: "1px solid var(--border)",
+                        cursor: "pointer",
+                        userSelect: "none",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {col.label}
+                      <SortIcon colKey={col.key} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((w, idx) => (
+                  <tr
+                    key={w.externalId}
+                    className="group"
+                    style={{
+                      borderBottom: idx < sorted.length - 1 ? "1px solid var(--border-subtle)" : "none",
+                      transition: "background 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--surface-1)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <td style={{ padding: "14px 16px" }}>
+                      <div className="flex items-center gap-3">
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: 24,
+                            height: 24,
+                            borderRadius: "var(--radius-sm)",
+                            background: idx < 3 ? "var(--primary-light)" : "var(--surface-2)",
+                            color: idx < 3 ? "var(--primary)" : "var(--foreground-subtle)",
+                            fontSize: "10px",
+                            fontWeight: 700,
+                            fontVariantNumeric: "tabular-nums",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {idx + 1}
+                        </span>
+                        <Link
+                          href={`/sites/${w.externalId}`}
+                          style={{
+                            fontWeight: 500,
+                            color: "var(--foreground)",
+                            fontSize: "var(--text-sm)",
+                            textDecoration: "none",
+                          }}
+                          className="hover:text-indigo-600 transition-colors"
+                        >
+                          {w.domain}
+                        </Link>
+                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "var(--foreground-subtle)" }} />
+                      </div>
+                    </td>
+                    {[
+                      { value: formatNumber(w.hits), color: "var(--foreground-muted)" },
+                      { value: formatNumber(w.impressions), color: "var(--foreground-muted)" },
+                      { value: formatNumber(w.clicks), color: "var(--foreground-muted)" },
+                      { value: formatCurrency(w.brokerIncome), color: "var(--success)", fontWeight: 600 },
+                      { value: `${w.ctr.toFixed(2)}%`, color: "var(--foreground-muted)" },
+                      { value: `${w.fillRate.toFixed(2)}%`, color: "var(--foreground-muted)" },
+                      { value: `$${w.realCpm.toFixed(4)}`, color: "var(--foreground-muted)" },
+                    ].map((cell, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: "14px 16px",
+                          textAlign: "right",
+                          fontSize: "var(--text-sm)",
+                          fontVariantNumeric: "tabular-nums",
+                          color: cell.color,
+                          fontWeight: (cell as { fontWeight?: number }).fontWeight || 400,
+                        }}
+                      >
+                        {cell.value}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                {sorted.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      style={{
+                        padding: "48px 16px",
+                        textAlign: "center",
+                        color: "var(--foreground-subtle)",
+                      }}
+                    >
+                      <Globe style={{ width: 32, height: 32, margin: "0 auto 8px", opacity: 0.4 }} />
+                      <p style={{ fontSize: "var(--text-sm)" }}>No sites found</p>
                       {search && (
-                        <p className="text-xs">Try adjusting your search query</p>
+                        <p style={{ fontSize: "var(--text-xs)", marginTop: 4 }}>
+                          Try adjusting your search query
+                        </p>
                       )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </motion.div>
   );

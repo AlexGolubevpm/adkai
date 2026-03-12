@@ -9,7 +9,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface TrendDataPoint {
   date: string;
@@ -78,20 +77,34 @@ function ChartTooltipContent({
   if (!active || !payload?.length) return null;
   return (
     <div
-      className="rounded-lg border px-3 py-2"
       style={{
-        borderColor: "var(--border)",
-        background: "white",
+        borderRadius: "var(--radius-lg)",
+        border: "1px solid var(--border)",
+        background: "var(--surface-0)",
         boxShadow: "var(--shadow-lg)",
+        padding: "10px 14px",
       }}
     >
       <p
-        className="mb-1 text-[10px] font-medium uppercase tracking-wider"
-        style={{ color: "var(--foreground-subtle)" }}
+        style={{
+          fontSize: "var(--text-xs)",
+          fontWeight: 500,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          color: "var(--foreground-subtle)",
+          marginBottom: 4,
+        }}
       >
         {label}
       </p>
-      <p className="text-sm font-semibold tabular-nums" style={{ color }}>
+      <p
+        style={{
+          fontSize: "var(--text-lg)",
+          fontWeight: 700,
+          fontVariantNumeric: "tabular-nums",
+          color,
+        }}
+      >
         {formatter(payload[0].value)}
       </p>
     </div>
@@ -100,109 +113,185 @@ function ChartTooltipContent({
 
 export default function DashboardCharts({ data }: DashboardChartsProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 16,
+      }}
+    >
       {chartConfig.map((cfg) => {
         const lastValue = data.length > 0 ? data[data.length - 1][cfg.dataKey] : 0;
         const firstValue = data.length > 1 ? data[0][cfg.dataKey] : lastValue;
-        const delta = firstValue !== 0 ? ((lastValue - firstValue) / Math.abs(firstValue)) * 100 : 0;
+        const delta =
+          firstValue !== 0
+            ? ((lastValue - firstValue) / Math.abs(firstValue)) * 100
+            : 0;
 
         return (
-          <Card key={cfg.dataKey} className="overflow-hidden">
-            <CardContent className="px-6 py-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p
-                    className="text-[11px] font-medium uppercase tracking-wider"
-                    style={{ color: "var(--foreground-subtle)" }}
-                  >
-                    {cfg.title}
-                  </p>
-                  <p className="mt-1 text-xl font-bold tabular-nums" style={{ color: "var(--foreground)" }}>
-                    {cfg.formatter(lastValue)}
-                  </p>
-                </div>
-                {data.length > 1 && (
-                  <span
-                    className="text-xs font-medium tabular-nums rounded-md px-2 py-0.5"
-                    style={
-                      delta >= 0
-                        ? { background: "var(--success-light)", color: "var(--success)" }
-                        : { background: "var(--danger-light)", color: "var(--danger)" }
+          <div
+            key={cfg.dataKey}
+            style={{
+              padding: "20px 20px 16px",
+              borderRadius: "var(--radius-lg)",
+              border: "1px solid var(--border)",
+              background: "var(--surface-1)",
+              transition: "border-color 0.15s, box-shadow 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--border-hover)";
+              e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <div
+              className="flex items-center justify-between"
+              style={{ marginBottom: 16 }}
+            >
+              <div>
+                <p
+                  style={{
+                    fontSize: "var(--text-xs)",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    color: "var(--foreground-subtle)",
+                    marginBottom: 6,
+                  }}
+                >
+                  {cfg.title}
+                </p>
+                <p
+                  style={{
+                    fontSize: "var(--text-xl)",
+                    fontWeight: 700,
+                    fontVariantNumeric: "tabular-nums",
+                    color: "var(--foreground)",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {cfg.formatter(lastValue)}
+                </p>
+              </div>
+              {data.length > 1 && (
+                <span
+                  style={{
+                    fontSize: "var(--text-xs)",
+                    fontWeight: 600,
+                    fontVariantNumeric: "tabular-nums",
+                    borderRadius: "var(--radius-md)",
+                    padding: "4px 10px",
+                    ...(delta >= 0
+                      ? {
+                          background: "var(--success-light)",
+                          color: "var(--success)",
+                        }
+                      : {
+                          background: "var(--danger-light)",
+                          color: "var(--danger)",
+                        }),
+                  }}
+                >
+                  {delta >= 0 ? "+" : ""}
+                  {delta.toFixed(1)}%
+                </span>
+              )}
+            </div>
+            <div style={{ height: 140, margin: "0 -8px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                  <defs>
+                    <linearGradient
+                      id={cfg.gradientId}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor={cfg.color}
+                        stopOpacity={0.12}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={cfg.color}
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--border-subtle)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="date"
+                    tick={{
+                      fill: "var(--foreground-subtle)",
+                      fontSize: 10,
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis
+                    tick={{
+                      fill: "var(--foreground-subtle)",
+                      fontSize: 10,
+                    }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={40}
+                    tickFormatter={(v: number) =>
+                      cfg.dataKey === "romi"
+                        ? `${v}%`
+                        : cfg.dataKey === "traffic"
+                          ? v >= 1000
+                            ? `${(v / 1000).toFixed(0)}K`
+                            : String(v)
+                          : v >= 1000
+                            ? `$${(v / 1000).toFixed(0)}K`
+                            : `$${v}`
                     }
-                  >
-                    {delta >= 0 ? "+" : ""}
-                    {delta.toFixed(1)}%
-                  </span>
-                )}
-              </div>
-              <div className="h-[160px] -mx-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={data}>
-                    <defs>
-                      <linearGradient id={cfg.gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={cfg.color} stopOpacity={0.08} />
-                        <stop offset="100%" stopColor={cfg.color} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="var(--border-subtle)"
-                      vertical={false}
-                    />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fill: "var(--foreground-subtle)", fontSize: 10 }}
-                      axisLine={false}
-                      tickLine={false}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis
-                      tick={{ fill: "var(--foreground-subtle)", fontSize: 10 }}
-                      axisLine={false}
-                      tickLine={false}
-                      width={45}
-                      tickFormatter={(v: number) =>
-                        cfg.dataKey === "romi"
-                          ? `${v}%`
-                          : cfg.dataKey === "traffic"
-                            ? v >= 1000
-                              ? `${(v / 1000).toFixed(0)}K`
-                              : String(v)
-                            : v >= 1000
-                              ? `$${(v / 1000).toFixed(0)}K`
-                              : `$${v}`
-                      }
-                    />
-                    <Tooltip
-                      content={({ active, payload, label }) => (
-                        <ChartTooltipContent
-                          active={active}
-                          payload={payload as unknown as Array<{ value: number; color: string }>}
-                          label={label as string}
-                          formatter={cfg.formatter}
-                          color={cfg.color}
-                        />
-                      )}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey={cfg.dataKey}
-                      stroke={cfg.color}
-                      strokeWidth={1.5}
-                      fill={`url(#${cfg.gradientId})`}
-                      dot={false}
-                      activeDot={{
-                        r: 4,
-                        fill: cfg.color,
-                        stroke: "white",
-                        strokeWidth: 2,
-                      }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+                  />
+                  <Tooltip
+                    content={({ active, payload, label }) => (
+                      <ChartTooltipContent
+                        active={active}
+                        payload={
+                          payload as unknown as Array<{
+                            value: number;
+                            color: string;
+                          }>
+                        }
+                        label={label as string}
+                        formatter={cfg.formatter}
+                        color={cfg.color}
+                      />
+                    )}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey={cfg.dataKey}
+                    stroke={cfg.color}
+                    strokeWidth={2}
+                    fill={`url(#${cfg.gradientId})`}
+                    dot={false}
+                    activeDot={{
+                      r: 5,
+                      fill: cfg.color,
+                      stroke: "white",
+                      strokeWidth: 2,
+                    }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         );
       })}
     </div>

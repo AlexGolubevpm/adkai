@@ -12,6 +12,7 @@ import {
   TrendingUp,
   PanelLeftClose,
   PanelLeftOpen,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,37 +21,31 @@ const navItems = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    description: "Overview & KPIs",
   },
   {
     label: "Sites",
     href: "/sites",
     icon: Globe,
-    description: "All websites",
   },
   {
     label: "Costs",
     href: "/costs",
     icon: DollarSign,
-    description: "Budget tracking",
   },
   {
     label: "Conclusions",
     href: "/conclusions",
     icon: FileText,
-    description: "Daily insights",
   },
   {
     label: "Forecast",
     href: "/forecast",
     icon: TrendingUp,
-    description: "Revenue modeling",
   },
   {
     label: "Analysis",
     href: "/analysis",
     icon: Brain,
-    description: "AI analysis",
   },
 ];
 
@@ -64,59 +59,85 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className="fixed left-0 top-0 z-40 flex h-screen flex-col bg-white transition-all duration-300 ease-[var(--ease-out)]"
+      className="fixed left-0 top-0 z-40 flex h-screen flex-col transition-all duration-300 ease-[var(--ease-out)]"
       style={{
-        width: collapsed ? 68 : 256,
+        width: collapsed ? 72 : 260,
+        background: "var(--surface-0)",
         borderRight: "1px solid var(--border)",
+        boxShadow: "var(--shadow-sidebar)",
       }}
     >
       {/* Logo */}
       <div
-        className="flex h-14 items-center shrink-0"
+        className="flex items-center shrink-0"
         style={{
+          height: "var(--topbar-height)",
           borderBottom: "1px solid var(--border)",
-          padding: collapsed ? "0 14px" : "0 20px",
-          gap: 10,
+          padding: collapsed ? "0 16px" : "0 20px",
+          gap: 12,
         }}
       >
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+          className="flex shrink-0 items-center justify-center"
           style={{
-            background: "var(--primary)",
-            boxShadow: "0 1px 3px rgba(99, 102, 241, 0.3)",
+            width: 36,
+            height: 36,
+            borderRadius: "var(--radius-lg)",
+            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+            boxShadow: "0 2px 8px rgba(99, 102, 241, 0.3)",
           }}
         >
-          <Activity className="h-4 w-4 text-white" />
+          <Activity className="h-[18px] w-[18px] text-white" />
         </div>
         {!collapsed && (
-          <div className="flex items-baseline gap-1.5 overflow-hidden">
+          <div className="flex flex-col overflow-hidden">
             <span
-              className="text-[15px] font-bold tracking-tight"
-              style={{ color: "var(--foreground)" }}
+              style={{
+                fontSize: "var(--text-lg)",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: "var(--foreground)",
+                lineHeight: 1.2,
+              }}
             >
               AdKai
             </span>
             <span
-              className="text-[10px] font-medium uppercase tracking-widest"
-              style={{ color: "var(--foreground-subtle)" }}
+              style={{
+                fontSize: "var(--text-xs)",
+                fontWeight: 500,
+                color: "var(--foreground-subtle)",
+                letterSpacing: "0.02em",
+              }}
             >
-              Analytics
+              Analytics Platform
             </span>
           </div>
         )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3" style={{ padding: collapsed ? "12px 8px" : "12px" }}>
+      <nav
+        className="flex-1 overflow-y-auto overflow-x-hidden"
+        style={{
+          padding: collapsed ? "16px 10px" : "16px 12px",
+        }}
+      >
         {!collapsed && (
           <p
-            className="px-3 pb-2 pt-2 text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: "var(--foreground-subtle)" }}
+            style={{
+              padding: "0 12px 8px",
+              fontSize: "var(--text-xs)",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "var(--foreground-subtle)",
+            }}
           >
-            Menu
+            Navigation
           </p>
         )}
-        <div className="space-y-0.5">
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || pathname.startsWith(item.href + "/");
@@ -128,19 +149,26 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 href={item.href}
                 title={collapsed ? item.label : undefined}
                 className={cn(
-                  "group flex items-center rounded-lg text-[13px] font-medium transition-all duration-200",
-                  collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2"
+                  "flex items-center transition-all duration-200",
+                  collapsed ? "justify-center" : "gap-3"
                 )}
-                style={
-                  isActive
+                style={{
+                  height: collapsed ? 44 : 42,
+                  borderRadius: "var(--radius-md)",
+                  padding: collapsed ? "0" : "0 12px",
+                  fontSize: "var(--text-sm)",
+                  fontWeight: isActive ? 600 : 500,
+                  ...(isActive
                     ? {
                         background: "var(--primary-light)",
                         color: "var(--primary)",
+                        boxShadow: "inset 3px 0 0 var(--primary)",
                       }
                     : {
                         color: "var(--foreground-muted)",
-                      }
-                }
+                        background: "transparent",
+                      }),
+                }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
                     e.currentTarget.style.background = "var(--surface-2)";
@@ -155,37 +183,32 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 }}
               >
                 <div
-                  className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors"
-                  )}
-                  style={
-                    isActive
-                      ? { color: "var(--primary)" }
-                      : { color: "var(--foreground-subtle)" }
-                  }
+                  className="flex shrink-0 items-center justify-center"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--radius-sm)",
+                  }}
                 >
-                  <Icon className="h-[18px] w-[18px]" />
+                  <Icon
+                    style={{
+                      width: 18,
+                      height: 18,
+                      color: isActive ? "var(--primary)" : "inherit",
+                    }}
+                  />
                 </div>
                 {!collapsed && (
                   <>
-                    <div className="flex flex-col overflow-hidden">
-                      <span className="leading-tight truncate">{item.label}</span>
-                      <span
-                        className="text-[10px] leading-tight truncate"
-                        style={{
-                          color: isActive
-                            ? "var(--primary)"
-                            : "var(--foreground-subtle)",
-                          opacity: isActive ? 0.7 : 1,
-                        }}
-                      >
-                        {item.description}
-                      </span>
-                    </div>
+                    <span className="truncate">{item.label}</span>
                     {isActive && (
-                      <div
-                        className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full"
-                        style={{ background: "var(--primary)" }}
+                      <ChevronRight
+                        style={{
+                          width: 14,
+                          height: 14,
+                          marginLeft: "auto",
+                          opacity: 0.5,
+                        }}
                       />
                     )}
                   </>
@@ -198,32 +221,72 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Bottom */}
       <div
-        className="shrink-0 flex items-center justify-between"
+        className="shrink-0 flex items-center"
         style={{
           borderTop: "1px solid var(--border)",
-          padding: collapsed ? "12px 14px" : "12px 16px",
+          padding: collapsed ? "12px 16px" : "14px 16px",
+          justifyContent: collapsed ? "center" : "space-between",
         }}
       >
-        <div className="flex items-center gap-2">
-          <div className="relative flex h-2 w-2 shrink-0">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        {!collapsed && (
+          <div className="flex items-center gap-2.5">
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "var(--radius-md)",
+                background: "var(--surface-2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "var(--text-xs)",
+                fontWeight: 600,
+                color: "var(--foreground-muted)",
+              }}
+            >
+              AK
+            </div>
+            <div style={{ overflow: "hidden" }}>
+              <p
+                style={{
+                  fontSize: "var(--text-sm)",
+                  fontWeight: 600,
+                  color: "var(--foreground)",
+                  lineHeight: 1.2,
+                }}
+              >
+                Admin
+              </p>
+              <p
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--foreground-subtle)",
+                  lineHeight: 1.2,
+                }}
+              >
+                AdKai Pro
+              </p>
+            </div>
           </div>
-          {!collapsed && (
-            <span className="text-[11px] font-medium" style={{ color: "var(--foreground-subtle)" }}>
-              System online
-            </span>
-          )}
-        </div>
+        )}
         <button
           onClick={onToggle}
-          className="flex h-7 w-7 items-center justify-center rounded-md transition-colors cursor-pointer"
-          style={{ color: "var(--foreground-subtle)" }}
+          className="flex items-center justify-center rounded-md transition-colors cursor-pointer"
+          style={{
+            width: 32,
+            height: 32,
+            color: "var(--foreground-subtle)",
+            border: "1px solid var(--border)",
+            background: "var(--surface-0)",
+            borderRadius: "var(--radius-md)",
+          }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = "var(--surface-2)";
+            e.currentTarget.style.borderColor = "var(--border-hover)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.background = "var(--surface-0)";
+            e.currentTarget.style.borderColor = "var(--border)";
           }}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
