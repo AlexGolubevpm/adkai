@@ -11,15 +11,23 @@ import {
   Eye,
   MousePointer,
   ArrowRight,
-  ArrowUpRight,
-  ArrowDownRight,
   Zap,
   TrendingUp,
-  BarChart3,
   Globe,
   Search,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { KpiCard, KpiCardGrid } from "@/components/ui/kpi-card";
 import PeriodFilter, { type PeriodValue } from "@/components/period-filter";
 import DashboardCharts from "@/components/dashboard-charts";
 import { cn, formatNumber, formatCurrency } from "@/lib/utils";
@@ -44,68 +52,13 @@ interface WebsiteRow {
 }
 
 const kpiConfig = [
-  {
-    label: "Total Hits",
-    key: "hits",
-    icon: Users,
-    color: "var(--kpi-blue)",
-    bg: "var(--kpi-blue-bg)",
-    format: formatNumber,
-  },
-  {
-    label: "Impressions",
-    key: "impressions",
-    icon: Eye,
-    color: "var(--kpi-cyan)",
-    bg: "var(--kpi-cyan-bg)",
-    format: formatNumber,
-  },
-  {
-    label: "Clicks",
-    key: "clicks",
-    icon: MousePointer,
-    color: "var(--kpi-amber)",
-    bg: "var(--kpi-amber-bg)",
-    format: formatNumber,
-  },
-  {
-    label: "Broker Income",
-    key: "broker_income",
-    icon: DollarSign,
-    color: "var(--kpi-green)",
-    bg: "var(--kpi-green-bg)",
-    format: formatCurrency,
-  },
-  {
-    label: "CTR",
-    key: "ctr",
-    icon: Target,
-    color: "var(--kpi-indigo)",
-    bg: "var(--kpi-indigo-bg)",
-    format: (v: number) => v.toFixed(2) + "%",
-  },
-  {
-    label: "Fill Rate",
-    key: "fill_rate",
-    icon: Activity,
-    color: "var(--kpi-purple)",
-    bg: "var(--kpi-purple-bg)",
-    format: (v: number) => v.toFixed(2) + "%",
-  },
+  { label: "Total Hits", key: "hits", icon: Users, color: "var(--kpi-blue)", bg: "var(--kpi-blue-bg)", format: formatNumber, tooltip: "Total page views across all sites" },
+  { label: "Impressions", key: "impressions", icon: Eye, color: "var(--kpi-cyan)", bg: "var(--kpi-cyan-bg)", format: formatNumber, tooltip: "Total ad impressions served" },
+  { label: "Clicks", key: "clicks", icon: MousePointer, color: "var(--kpi-amber)", bg: "var(--kpi-amber-bg)", format: formatNumber, tooltip: "Total ad clicks recorded" },
+  { label: "Broker Income", key: "broker_income", icon: DollarSign, color: "var(--kpi-green)", bg: "var(--kpi-green-bg)", format: formatCurrency, tooltip: "Total revenue from ad broker" },
+  { label: "CTR", key: "ctr", icon: Target, color: "var(--kpi-indigo)", bg: "var(--kpi-indigo-bg)", format: (v: number) => v.toFixed(2) + "%", tooltip: "Click-through rate = Clicks / Hits" },
+  { label: "Fill Rate", key: "fill_rate", icon: Activity, color: "var(--kpi-purple)", bg: "var(--kpi-purple-bg)", format: (v: number) => v.toFixed(2) + "%", tooltip: "Impressions / Hits ratio" },
 ];
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0 },
-};
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<PeriodValue>({ preset: "yesterday" });
@@ -119,15 +72,12 @@ export default function DashboardPage() {
   const { data: totalsData, loading: totalsLoading } = useApi<AsgReportRow[]>(
     `/api/asg/report?from=${range.from}&to=${range.to}`
   );
-
   const { data: websitesData, loading: websitesLoading } = useApi<WebsiteRow[]>(
     `/api/asg/websites?from=${range.from}&to=${range.to}`
   );
-
   const { data: dailyData } = useApi<AsgReportRow[]>(
     `/api/asg/report?from=${range.from}&to=${range.to}&group_by=date`
   );
-
   const { data: adTypeData } = useApi<AsgReportRow[]>(
     `/api/asg/report?from=${range.from}&to=${range.to}&group_by=ad_type`
   );
@@ -165,448 +115,196 @@ export default function DashboardPage() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className="space-y-7"
     >
       {/* Period Filter Bar */}
-      <div
-        className="flex items-center justify-between"
-        style={{ marginBottom: "var(--section-gap)" }}
-      >
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <BarChart3 style={{ width: 20, height: 20, color: "var(--primary)" }} />
-          <span
-            style={{
-              fontSize: "var(--text-lg)",
-              fontWeight: 600,
-              color: "var(--foreground)",
-            }}
-          >
-            Overview
-          </span>
-          <Badge variant="secondary" style={{ marginLeft: 4 }}>
+          <Badge variant="secondary">
             {range.from} — {range.to}
           </Badge>
         </div>
         <PeriodFilter value={period} onChange={setPeriod} />
       </div>
 
-      {/* ── Section 1: KPI Cards ── */}
+      {/* KPI Cards */}
       {totals && (
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(6, 1fr)",
-            gap: 16,
-            marginBottom: "var(--section-gap)",
-          }}
-        >
+        <KpiCardGrid cols={6}>
           {kpiConfig.map((kpi) => {
             const value = (totals as unknown as Record<string, number>)[kpi.key] ?? 0;
-            const Icon = kpi.icon;
+            const sparkline = dailyData?.map((d) => (d as unknown as Record<string, number>)[kpi.key] ?? 0);
             return (
-              <motion.div key={kpi.key} variants={item}>
-                <div className="kpi-card">
-                  <div
-                    className="flex items-center justify-between"
-                    style={{ marginBottom: 16 }}
-                  >
-                    <div
-                      className="kpi-icon"
-                      style={{ background: kpi.bg, color: kpi.color }}
-                    >
-                      <Icon style={{ width: 18, height: 18 }} />
-                    </div>
-                  </div>
-                  <div className="kpi-value" style={{ marginBottom: 6 }}>
-                    {kpi.format(value)}
-                  </div>
-                  <div className="kpi-label">{kpi.label}</div>
-                </div>
-              </motion.div>
+              <KpiCard
+                key={kpi.key}
+                label={kpi.label}
+                value={kpi.format(value)}
+                icon={kpi.icon}
+                color={kpi.color}
+                bg={kpi.bg}
+                tooltip={kpi.tooltip}
+                sparklineData={sparkline}
+              />
             );
           })}
-        </motion.div>
+        </KpiCardGrid>
       )}
 
-      {/* ── Section 2: Ad Formats Summary Panel ── */}
+      {/* Ad Formats Summary */}
       {adTypeData && adTypeData.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.3 }}
-          className="section-panel"
-          style={{ marginBottom: "var(--section-gap)" }}
         >
-          <div className="section-panel-header">
-            <div className="flex items-center gap-2">
-              <Zap style={{ width: 16, height: 16, color: "var(--kpi-amber)" }} />
-              <span className="section-heading">Ad Formats</span>
-              <Badge variant="secondary">
-                {adTypeData.filter((a) => a.hits > 0).length} active
-              </Badge>
-            </div>
-          </div>
-          <div className="section-panel-content">
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                gap: 12,
-              }}
-            >
-              {adTypeData
-                .filter((a) => a.hits > 0)
-                .sort((a, b) => b.broker_income - a.broker_income)
-                .map((adType) => (
-                  <div
-                    key={adType.name}
-                    style={{
-                      padding: "16px 18px",
-                      borderRadius: "var(--radius-lg)",
-                      border: "1px solid var(--border)",
-                      background: "var(--surface-1)",
-                      transition: "border-color 0.15s, box-shadow 0.15s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = "var(--border-hover)";
-                      e.currentTarget.style.boxShadow = "var(--shadow-sm)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = "var(--border)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        fontWeight: 600,
-                        color: "var(--foreground)",
-                        marginBottom: 12,
-                      }}
-                    >
-                      {adType.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "var(--text-xl)",
-                        fontWeight: 700,
-                        color: "var(--success)",
-                        fontVariantNumeric: "tabular-nums",
-                        marginBottom: 12,
-                        letterSpacing: "-0.02em",
-                      }}
-                    >
-                      {formatCurrency(adType.broker_income)}
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      <div className="flex justify-between" style={{ fontSize: "var(--text-xs)" }}>
-                        <span style={{ color: "var(--foreground-subtle)" }}>Hits</span>
-                        <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums", color: "var(--foreground-muted)" }}>
-                          {formatNumber(adType.hits)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between" style={{ fontSize: "var(--text-xs)" }}>
-                        <span style={{ color: "var(--foreground-subtle)" }}>CTR</span>
-                        <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums", color: "var(--foreground-muted)" }}>
-                          {adType.ctr.toFixed(2)}%
-                        </span>
-                      </div>
-                      <div className="flex justify-between" style={{ fontSize: "var(--text-xs)" }}>
-                        <span style={{ color: "var(--foreground-subtle)" }}>Fill Rate</span>
-                        <span style={{ fontWeight: 500, fontVariantNumeric: "tabular-nums", color: "var(--foreground-muted)" }}>
-                          {adType.fill_rate.toFixed(2)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-[var(--kpi-amber)]" />
+                <CardTitle>Ad Formats</CardTitle>
+                <Badge variant="secondary">
+                  {adTypeData.filter((a) => a.hits > 0).length} active
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+                {adTypeData
+                  .filter((a) => a.hits > 0)
+                  .sort((a, b) => b.broker_income - a.broker_income)
+                  .map((adType) => (
+                    <Card key={adType.name} className="bg-[var(--surface-1)] hover:border-[var(--border-hover)] hover:shadow-[var(--shadow-sm)] transition-all">
+                      <CardContent className="p-4">
+                        <p className="text-sm font-semibold text-[var(--foreground)] mb-2">{adType.name}</p>
+                        <p className="text-xl font-bold tabular-nums text-[var(--success)] tracking-tight mb-3">
+                          {formatCurrency(adType.broker_income)}
+                        </p>
+                        <div className="space-y-1.5">
+                          {[
+                            { label: "Hits", value: formatNumber(adType.hits) },
+                            { label: "CTR", value: `${adType.ctr.toFixed(2)}%` },
+                            { label: "Fill Rate", value: `${adType.fill_rate.toFixed(2)}%` },
+                          ].map((row) => (
+                            <div key={row.label} className="flex justify-between text-[11px]">
+                              <span className="text-[var(--foreground-subtle)]">{row.label}</span>
+                              <span className="font-medium tabular-nums text-[var(--foreground-muted)]">{row.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 
-      {/* ── Section 3: Daily Trends Panel ── */}
+      {/* Daily Trends */}
       {trendData.length > 1 && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.3 }}
-          className="section-panel"
-          style={{ marginBottom: "var(--section-gap)" }}
         >
-          <div className="section-panel-header">
-            <div className="flex items-center gap-2">
-              <TrendingUp style={{ width: 16, height: 16, color: "var(--kpi-green)" }} />
-              <span className="section-heading">Daily Trends</span>
-            </div>
-          </div>
-          <div className="section-panel-content">
-            <DashboardCharts data={trendData} />
-          </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-[var(--kpi-green)]" />
+                <CardTitle>Daily Trends</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DashboardCharts data={trendData} />
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 
-      {/* ── Section 4: Top Websites Data Table ── */}
+      {/* Top Websites Table */}
       {topSites.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.3 }}
         >
-          <div className="data-table-container">
-            {/* Table Toolbar */}
-            <div className="data-table-toolbar">
-              <div className="flex items-center gap-3">
-                <Globe style={{ width: 16, height: 16, color: "var(--kpi-blue)" }} />
-                <span className="section-heading">Top Websites</span>
-                <Badge variant="secondary">
-                  {websitesData?.length ?? 0} total
-                </Badge>
-              </div>
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex items-center gap-2"
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "var(--radius-md)",
-                    border: "1px solid var(--border)",
-                    background: "var(--surface-1)",
-                  }}
-                >
-                  <Search style={{ width: 14, height: 14, color: "var(--foreground-subtle)" }} />
-                  <input
-                    type="text"
-                    placeholder="Search sites..."
-                    value={tableSearch}
-                    onChange={(e) => setTableSearch(e.target.value)}
-                    style={{
-                      border: "none",
-                      outline: "none",
-                      background: "transparent",
-                      fontSize: "var(--text-sm)",
-                      color: "var(--foreground)",
-                      width: 140,
-                    }}
-                  />
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-[var(--kpi-blue)]" />
+                  <CardTitle>Top Websites</CardTitle>
+                  <Badge variant="secondary">{websitesData?.length ?? 0} total</Badge>
                 </div>
-                <Link
-                  href="/sites"
-                  className="flex items-center gap-1.5 transition-colors"
-                  style={{
-                    fontSize: "var(--text-sm)",
-                    fontWeight: 500,
-                    color: "var(--primary)",
-                    padding: "6px 12px",
-                    borderRadius: "var(--radius-md)",
-                    border: "1px solid var(--primary)",
-                    background: "var(--primary-light)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "var(--primary)";
-                    e.currentTarget.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "var(--primary-light)";
-                    e.currentTarget.style.color = "var(--primary)";
-                  }}
-                >
-                  View all
-                  <ArrowRight style={{ width: 14, height: 14 }} />
-                </Link>
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--foreground-subtle)]" />
+                    <Input
+                      placeholder="Search sites..."
+                      value={tableSearch}
+                      onChange={(e) => setTableSearch(e.target.value)}
+                      className="pl-9 h-8 w-44 text-sm"
+                    />
+                  </div>
+                  <Link
+                    href="/sites"
+                    className="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium rounded-lg border border-[var(--border)] bg-white text-[var(--foreground-secondary)] hover:bg-[var(--surface-2)] hover:border-[var(--border-hover)] transition-colors"
+                  >
+                    View all
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
               </div>
-            </div>
-
-            {/* Table */}
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead
-                  style={{
-                    background: "var(--surface-1)",
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 10,
-                  }}
-                >
-                  <tr>
-                    <th
-                      style={{
-                        padding: "12px 16px",
-                        fontSize: "var(--text-xs)",
-                        fontWeight: 600,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                        color: "var(--foreground-subtle)",
-                        textAlign: "left",
-                        borderBottom: "1px solid var(--border)",
-                      }}
-                    >
-                      Website
-                    </th>
-                    {["Hits", "Impressions", "Clicks", "Income", "CTR", "Fill Rate", "eCPM"].map(
-                      (col) => (
-                        <th
-                          key={col}
-                          className="text-right"
-                          style={{
-                            padding: "12px 16px",
-                            fontSize: "var(--text-xs)",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.06em",
-                            color: "var(--foreground-subtle)",
-                            textAlign: "right",
-                            borderBottom: "1px solid var(--border)",
-                          }}
+            </CardHeader>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Website</TableHead>
+                  <TableHead className="text-right">Hits</TableHead>
+                  <TableHead className="text-right">Impressions</TableHead>
+                  <TableHead className="text-right">Clicks</TableHead>
+                  <TableHead className="text-right">Income</TableHead>
+                  <TableHead className="text-right">CTR</TableHead>
+                  <TableHead className="text-right">Fill Rate</TableHead>
+                  <TableHead className="text-right">eCPM</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {topSites.map((w, idx) => (
+                  <TableRow key={w.externalId}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={cn(
+                            "flex h-6 w-6 items-center justify-center rounded text-[10px] font-bold tabular-nums shrink-0",
+                            idx < 3
+                              ? "bg-[var(--primary-light)] text-[var(--primary)]"
+                              : "bg-[var(--surface-2)] text-[var(--foreground-subtle)]"
+                          )}
                         >
-                          {col}
-                        </th>
-                      )
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {topSites.map((w, idx) => (
-                    <tr
-                      key={w.externalId}
-                      style={{
-                        borderBottom: idx < topSites.length - 1 ? "1px solid var(--border-subtle)" : "none",
-                        transition: "background 0.15s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "var(--surface-1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      <td style={{ padding: "14px 16px" }}>
-                        <div className="flex items-center gap-3">
-                          <span
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              width: 28,
-                              height: 28,
-                              borderRadius: "var(--radius-md)",
-                              background:
-                                idx < 3 ? "var(--primary-light)" : "var(--surface-2)",
-                              color:
-                                idx < 3 ? "var(--primary)" : "var(--foreground-subtle)",
-                              fontSize: "var(--text-xs)",
-                              fontWeight: 700,
-                              fontVariantNumeric: "tabular-nums",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {idx + 1}
-                          </span>
-                          <Link
-                            href={`/sites/${w.externalId}`}
-                            style={{
-                              fontWeight: 500,
-                              color: "var(--foreground)",
-                              fontSize: "var(--text-sm)",
-                              textDecoration: "none",
-                              transition: "color 0.15s",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.color = "var(--primary)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.color = "var(--foreground)";
-                            }}
-                          >
-                            {w.domain}
-                          </Link>
-                        </div>
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--foreground-muted)",
-                        }}
-                      >
-                        {formatNumber(w.hits)}
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--foreground-muted)",
-                        }}
-                      >
-                        {formatNumber(w.impressions)}
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--foreground-muted)",
-                        }}
-                      >
-                        {formatNumber(w.clicks)}
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          fontWeight: 600,
-                          color: "var(--success)",
-                        }}
-                      >
-                        {formatCurrency(w.brokerIncome)}
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--foreground-muted)",
-                        }}
-                      >
-                        {w.ctr.toFixed(2)}%
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--foreground-muted)",
-                        }}
-                      >
-                        {w.fillRate.toFixed(2)}%
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 16px",
-                          textAlign: "right",
-                          fontSize: "var(--text-sm)",
-                          fontVariantNumeric: "tabular-nums",
-                          color: "var(--foreground-muted)",
-                        }}
-                      >
-                        ${w.realCpm.toFixed(4)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                          {idx + 1}
+                        </span>
+                        <Link
+                          href={`/sites/${w.externalId}`}
+                          className="font-medium text-sm text-[var(--foreground)] hover:text-[var(--primary)] transition-colors"
+                        >
+                          {w.domain}
+                        </Link>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">{formatNumber(w.hits)}</TableCell>
+                    <TableCell className="text-right">{formatNumber(w.impressions)}</TableCell>
+                    <TableCell className="text-right">{formatNumber(w.clicks)}</TableCell>
+                    <TableCell className="text-right font-semibold text-[var(--success)]">
+                      {formatCurrency(w.brokerIncome)}
+                    </TableCell>
+                    <TableCell className="text-right">{w.ctr.toFixed(2)}%</TableCell>
+                    <TableCell className="text-right">{w.fillRate.toFixed(2)}%</TableCell>
+                    <TableCell className="text-right">${w.realCpm.toFixed(4)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         </motion.div>
       )}
     </motion.div>
