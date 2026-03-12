@@ -1,77 +1,109 @@
 @import "tailwindcss";
 
 :root {
-  /* ─── Background layers ─── */
-  --background: #f8f9fb;
-  --background-subtle: #f3f4f7;
+  /* ─── Surface Layers (5 levels of depth) ─── */
+  --background: #f0f2f5;
+  --background-subtle: #e8eaef;
   --surface-0: #ffffff;
-  --surface-1: #ffffff;
-  --surface-2: #f5f6f8;
-  --surface-3: #eef0f3;
+  --surface-1: #f8f9fb;
+  --surface-2: #f2f3f7;
+  --surface-3: #ebedf2;
+  --surface-elevated: #ffffff;
 
-  /* ─── Foreground ─── */
-  --foreground: #111827;
-  --foreground-secondary: #374151;
-  --foreground-muted: #6b7280;
-  --foreground-subtle: #9ca3af;
-  --foreground-disabled: #d1d5db;
+  /* ─── Foreground Hierarchy ─── */
+  --foreground: #0f172a;
+  --foreground-secondary: #1e293b;
+  --foreground-muted: #475569;
+  --foreground-subtle: #94a3b8;
+  --foreground-disabled: #cbd5e1;
 
   /* ─── Borders ─── */
-  --border: #e5e7eb;
-  --border-subtle: #f0f1f3;
-  --border-hover: #d1d5db;
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --border-hover: #cbd5e1;
   --border-focus: #6366f1;
+  --border-strong: #94a3b8;
 
   /* ─── Primary (Indigo) ─── */
   --primary: #6366f1;
   --primary-hover: #4f46e5;
   --primary-light: #eef2ff;
-  --primary-muted: rgba(99, 102, 241, 0.08);
+  --primary-muted: rgba(99, 102, 241, 0.06);
   --primary-foreground: #ffffff;
 
   /* ─── Accent (Blue) ─── */
   --accent: #3b82f6;
   --accent-light: #eff6ff;
-  --accent-muted: rgba(59, 130, 246, 0.08);
+  --accent-muted: rgba(59, 130, 246, 0.06);
 
   /* ─── Semantic: Success ─── */
   --success: #059669;
   --success-light: #ecfdf5;
-  --success-muted: rgba(5, 150, 105, 0.08);
+  --success-muted: rgba(5, 150, 105, 0.06);
   --success-foreground: #065f46;
 
   /* ─── Semantic: Warning ─── */
   --warning: #d97706;
   --warning-light: #fffbeb;
-  --warning-muted: rgba(217, 119, 6, 0.08);
+  --warning-muted: rgba(217, 119, 6, 0.06);
   --warning-foreground: #92400e;
 
   /* ─── Semantic: Danger ─── */
   --danger: #dc2626;
   --danger-light: #fef2f2;
-  --danger-muted: rgba(220, 38, 38, 0.08);
+  --danger-muted: rgba(220, 38, 38, 0.06);
   --danger-foreground: #991b1b;
 
   /* ─── Ring / Focus ─── */
   --ring: #6366f1;
   --ring-offset: #ffffff;
 
-  /* ─── Shadows ─── */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  /* ─── Shadows (deeper, more layered) ─── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.06), 0 16px 48px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-sidebar: 2px 0 8px rgba(0, 0, 0, 0.04);
 
   /* ─── Radius ─── */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-2xl: 20px;
 
   /* ─── Layout ─── */
-  --sidebar-width: 256px;
-  --sidebar-collapsed: 68px;
-  --topbar-height: 56px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
+  --topbar-height: 60px;
+  --page-padding: 32px;
+  --section-gap: 28px;
+  --card-padding: 24px;
+
+  /* ─── Spacing Scale ─── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* ─── Typography Scale ─── */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  --heading-weight: 700;
+  --label-weight: 600;
 
   /* ─── Chart palette ─── */
   --chart-1: #6366f1;
@@ -82,6 +114,20 @@
   --chart-6: #ef4444;
   --chart-7: #8b5cf6;
   --chart-8: #ec4899;
+
+  /* ─── KPI accent colors ─── */
+  --kpi-blue: #3b82f6;
+  --kpi-blue-bg: #eff6ff;
+  --kpi-cyan: #06b6d4;
+  --kpi-cyan-bg: #ecfeff;
+  --kpi-amber: #f59e0b;
+  --kpi-amber-bg: #fffbeb;
+  --kpi-green: #10b981;
+  --kpi-green-bg: #ecfdf5;
+  --kpi-indigo: #6366f1;
+  --kpi-indigo-bg: #eef2ff;
+  --kpi-purple: #8b5cf6;
+  --kpi-purple-bg: #f5f3ff;
 
   /* ─── Motion ─── */
   --duration-fast: 150ms;
@@ -112,6 +158,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   letter-spacing: -0.011em;
+  font-size: var(--text-base);
 }
 
 /* ─── Tabular numerals for data ─── */
@@ -204,6 +251,161 @@ body {
 .stagger-children > *:nth-child(7) { animation-delay: 240ms; }
 .stagger-children > *:nth-child(8) { animation-delay: 280ms; }
 
+/* ─── Section panel ─── */
+.section-panel {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.section-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.section-panel-content {
+  padding: 16px 24px 24px;
+}
+
+/* ─── KPI card premium ─── */
+.kpi-card {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 20px 24px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--border-hover);
+}
+
+.kpi-card .kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-card .kpi-value {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--foreground);
+}
+
+.kpi-card .kpi-label {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--foreground-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Data table premium ─── */
+.data-table-container {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.data-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table-container thead {
+  background: var(--surface-1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table-container thead th {
+  padding: 12px 16px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--foreground-subtle);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table-container thead th.text-right {
+  text-align: right;
+}
+
+.data-table-container tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+}
+
+.data-table-container tbody tr:last-child {
+  border-bottom: none;
+}
+
+.data-table-container tbody tr:hover {
+  background: var(--surface-1);
+}
+
+.data-table-container tbody td {
+  padding: 14px 16px;
+  font-size: var(--text-sm);
+  color: var(--foreground-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table-container tbody td:first-child {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* ─── Page heading ─── */
+.page-heading {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: var(--text-sm);
+  color: var(--foreground-muted);
+  margin-top: 4px;
+}
+
+/* ─── Section heading ─── */
+.section-heading {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
 /* ─── Chart styles ─── */
 .recharts-wrapper {
   font-family: "Inter", system-ui, sans-serif !important;
@@ -224,4 +426,29 @@ body {
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-md) !important;
   box-shadow: var(--shadow-lg) !important;
+}
+
+/* ─── Top bar ─── */
+.topbar {
+  height: var(--topbar-height);
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--page-padding);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(8px);
+}
+
+/* ─── App shell ─── */
+.app-canvas {
+  min-height: calc(100vh - var(--topbar-height));
+  padding: var(--page-padding);
+}
+
+.app-canvas > * + * {
+  margin-top: var(--section-gap);
 }

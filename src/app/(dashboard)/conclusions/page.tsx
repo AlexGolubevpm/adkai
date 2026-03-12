@@ -171,10 +171,7 @@ export default function ConclusionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
-            Daily Conclusions
-          </h1>
-          <p className="mt-0.5 text-sm text-[var(--foreground-muted)]">
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--foreground-muted)" }}>
             AI-generated insights and key findings
           </p>
         </div>

@@ -334,10 +334,7 @@ export default function ForecastPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
-            Forecast & Modeling
-          </h1>
-          <p className="mt-0.5 text-sm text-[var(--foreground-muted)]">
+          <p style={{ fontSize: "var(--text-sm)", color: "var(--foreground-muted)" }}>
             Simulate CPM changes and model revenue scenarios
           </p>
         </div>

@@ -210,7 +210,6 @@ export default function CostsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">Costs</h1>
           <div className="mt-1 flex items-center gap-2 text-sm text-[var(--foreground-muted)]">
             {lastSync ? (
               <>
@@ -252,23 +251,30 @@ export default function CostsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-3 stagger-children">
-        {kpis.map((kpi) => (
-          <Card key={kpi.label} className="relative overflow-hidden">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-subtle)]">
-                  {kpi.label}
-                </span>
-                <kpi.icon className="h-4 w-4" style={{ color: kpi.color }} />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        {kpis.map((kpi) => {
+          const bgMap: Record<string, string> = {
+            "#ef4444": "var(--danger-light)",
+            "#f59e0b": "var(--warning-light)",
+            "#22c55e": "var(--success-light)",
+          };
+          return (
+            <div key={kpi.label} className="kpi-card">
+              <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+                <div
+                  className="kpi-icon"
+                  style={{ background: bgMap[kpi.color] || "var(--surface-2)", color: kpi.color }}
+                >
+                  <kpi.icon style={{ width: 18, height: 18 }} />
+                </div>
               </div>
-              <p className="text-2xl font-bold tabular-nums" style={{ color: kpi.color }}>
+              <div className="kpi-value">
                 {costsLoading ? <Skeleton className="h-8 w-24" /> : kpi.value}
-              </p>
-            </CardContent>
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-40" style={{ backgroundColor: kpi.color }} />
-          </Card>
-        ))}
+              </div>
+              <div className="kpi-label">{kpi.label}</div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Sync Results Banner */}
