@@ -3,8 +3,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -15,16 +13,7 @@ import {
   Area,
   ComposedChart,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import PeriodFilter, { type PeriodValue } from "@/components/period-filter";
@@ -36,8 +25,6 @@ import {
   formatPercent,
 } from "@/lib/utils";
 import {
-  TrendingUp,
-  TrendingDown,
   Minus,
   Target,
   BarChart3,
@@ -276,8 +263,6 @@ export default function ForecastPage() {
   // Breakeven CPM multiplier (where profit = 0)
   const breakevenMult = useMemo(() => {
     if (totals.revenue * trafficMult === 0) return null;
-    // revenue × mult × trafficMult = costs × costsMult
-    // mult = (costs × costsMult) / (revenue × trafficMult)
     return (totals.costs * costsMult) / (totals.revenue * trafficMult);
   }, [totals, trafficMult, costsMult]);
 
@@ -285,9 +270,6 @@ export default function ForecastPage() {
 
   // CPM needed for target ROMI
   const cpmForRomi = useCallback((targetRomi: number) => {
-    // revenue = costs × (1 + targetRomi/100)
-    // revenue / currentRevenue = costs × (1 + targetRomi/100) / currentRevenue
-    // mult = costs × (1 + targetRomi/100) / (currentRevenue × trafficMult)
     if (totals.revenue * trafficMult === 0) return null;
     const mult = (totals.costs * costsMult * (1 + targetRomi / 100)) / (totals.revenue * trafficMult);
     return totals.avgRealCpm * mult;
@@ -322,6 +304,47 @@ export default function ForecastPage() {
 
   const hasScenario = cpmDelta !== 0 || trafficDelta !== 0 || costsDelta !== 0;
 
+  // ─── KPI data ──────────────────────────────────────────────────
+
+  const kpiItems = [
+    {
+      label: "Revenue",
+      current: totals.revenue,
+      projected: proj.revenue,
+      delta: proj.revenue - totals.revenue,
+      format: "currency" as const,
+      color: "#22c55e",
+      bgColor: "var(--success-light, rgba(34,197,94,0.08))",
+    },
+    {
+      label: "Profit",
+      current: totals.profit,
+      projected: proj.profit,
+      delta: proj.profit - totals.profit,
+      format: "currency" as const,
+      color: "#3b82f6",
+      bgColor: "var(--info-light, rgba(59,130,246,0.08))",
+    },
+    {
+      label: "ROMI",
+      current: totals.romi,
+      projected: proj.romi,
+      delta: proj.romi - totals.romi,
+      format: "pp" as const,
+      color: "#a855f7",
+      bgColor: "rgba(168,85,247,0.08)",
+    },
+    {
+      label: "Revenue / 1K",
+      current: totals.revenuePer1000,
+      projected: proj.revenuePer1000,
+      delta: proj.revenuePer1000 - totals.revenuePer1000,
+      format: "currency" as const,
+      color: "#f59e0b",
+      bgColor: "var(--warning-light, rgba(245,158,11,0.08))",
+    },
+  ];
+
   // ─── Render ───────────────────────────────────────────────────
 
   return (
@@ -355,27 +378,27 @@ export default function ForecastPage() {
       </div>
 
       {/* Scenario Controls */}
-      <Card className="overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-500/10">
-                <Zap className="h-3.5 w-3.5 text-indigo-600" />
-              </div>
-              <CardTitle className="text-sm">Scenario Controls</CardTitle>
+      <div className="section-panel">
+        <div className="section-panel-header">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-500/10">
+              <Zap className="h-3.5 w-3.5 text-indigo-600" />
             </div>
-            {hasScenario && (
-              <button
-                onClick={() => { setCpmDelta(0); setTrafficDelta(0); setCostsDelta(0); }}
-                className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors"
-              >
-                <RotateCcw className="h-3 w-3" />
-                Reset all
-              </button>
-            )}
+            <h2 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
+              Scenario Controls
+            </h2>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3 pb-5">
+          {hasScenario && (
+            <button
+              onClick={() => { setCpmDelta(0); setTrafficDelta(0); setCostsDelta(0); }}
+              className="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface-2)] transition-colors"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset all
+            </button>
+          )}
+        </div>
+        <div className="section-panel-content space-y-3">
           <RangeSlider
             label="CPM"
             value={cpmDelta}
@@ -403,47 +426,14 @@ export default function ForecastPage() {
             step={5}
             color="#f59e0b"
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Summary KPIs */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          {
-            label: "Revenue",
-            current: totals.revenue,
-            projected: proj.revenue,
-            delta: proj.revenue - totals.revenue,
-            format: "currency" as const,
-            color: "#22c55e",
-          },
-          {
-            label: "Profit",
-            current: totals.profit,
-            projected: proj.profit,
-            delta: proj.profit - totals.profit,
-            format: "currency" as const,
-            color: "#3b82f6",
-          },
-          {
-            label: "ROMI",
-            current: totals.romi,
-            projected: proj.romi,
-            delta: proj.romi - totals.romi,
-            format: "pp" as const,
-            color: "#a855f7",
-          },
-          {
-            label: "Revenue / 1K",
-            current: totals.revenuePer1000,
-            projected: proj.revenuePer1000,
-            delta: proj.revenuePer1000 - totals.revenuePer1000,
-            format: "currency" as const,
-            color: "#f59e0b",
-          },
-        ].map((kpi) => (
-          <Card key={kpi.label} className="relative overflow-hidden">
-            <CardContent className="p-4">
+        {kpiItems.map((kpi) => (
+          <div key={kpi.label} className="kpi-card relative overflow-hidden">
+            <div style={{ padding: 16 }}>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-subtle)] mb-2">
                 {kpi.label}
               </p>
@@ -478,29 +468,31 @@ export default function ForecastPage() {
                   <DeltaBadge delta={kpi.delta} format={kpi.format === "pp" ? "pp" : "currency"} />
                 </>
               )}
-            </CardContent>
+            </div>
             <div
               className="absolute bottom-0 left-0 right-0 h-[2px] opacity-30"
               style={{ backgroundColor: kpi.color }}
             />
-          </Card>
+          </div>
         ))}
       </div>
 
       {/* Chart + Breakeven */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* CPM Sensitivity Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
+        <div className="section-panel lg:col-span-2">
+          <div className="section-panel-header">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-[var(--foreground-muted)]" />
-              <CardTitle>CPM Sensitivity</CardTitle>
+              <h2 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
+                CPM Sensitivity
+              </h2>
             </div>
-            <p className="text-xs text-[var(--foreground-muted)]">
+          </div>
+          <div className="section-panel-content">
+            <p className="text-xs text-[var(--foreground-muted)] mb-3">
               Revenue & profit across CPM values — current, projected, and breakeven marked
             </p>
-          </CardHeader>
-          <CardContent>
             {loading ? (
               <Skeleton className="h-64 w-full" />
             ) : totals.revenue === 0 ? (
@@ -609,21 +601,23 @@ export default function ForecastPage() {
                 </ComposedChart>
               </ResponsiveContainer>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Breakeven Analysis */}
-        <Card>
-          <CardHeader>
+        <div className="section-panel">
+          <div className="section-panel-header">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-[var(--foreground-muted)]" />
-              <CardTitle>Breakeven Analysis</CardTitle>
+              <h2 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
+                Breakeven Analysis
+              </h2>
             </div>
+          </div>
+          <div className="section-panel-content space-y-3">
             <p className="text-xs text-[var(--foreground-muted)]">
               CPM targets based on {hasScenario ? "projected" : "current"} costs
             </p>
-          </CardHeader>
-          <CardContent className="space-y-3">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="h-10 w-full" />
@@ -636,11 +630,11 @@ export default function ForecastPage() {
                     Current Avg CPM
                   </div>
                   <div className="text-xl font-bold tabular-nums text-[var(--foreground)]">
-                    {totals.avgRealCpm > 0 ? `$${totals.avgRealCpm.toFixed(3)}` : "—"}
+                    {totals.avgRealCpm > 0 ? `$${totals.avgRealCpm.toFixed(3)}` : "\u2014"}
                   </div>
                   {hasScenario && (
                     <div className="text-sm text-indigo-600 mt-0.5">
-                      → ${proj.avgRealCpm.toFixed(3)} projected
+                      \u2192 ${proj.avgRealCpm.toFixed(3)} projected
                     </div>
                   )}
                 </div>
@@ -654,7 +648,6 @@ export default function ForecastPage() {
                 ].map(({ label, romi, color }) => {
                   const targetCpm = romi === 0 ? breakevenCpm : cpmForRomi(romi);
                   const currentCpm = totals.avgRealCpm;
-                  const isAchieved = targetCpm !== null && currentCpm >= targetCpm;
                   const isCurrent = romi === 0
                     ? totals.profit >= 0
                     : totals.romi >= romi;
@@ -685,11 +678,11 @@ export default function ForecastPage() {
                               "text-[10px]",
                               isCurrent ? "text-emerald-600" : "text-[var(--foreground-subtle)]"
                             )}>
-                              {isCurrent ? "✓ Achieved" : `Gap: ${((targetCpm / currentCpm - 1) * 100).toFixed(0)}%`}
+                              {isCurrent ? "\u2713 Achieved" : `Gap: ${((targetCpm / currentCpm - 1) * 100).toFixed(0)}%`}
                             </div>
                           </>
                         ) : (
-                          <span className="text-xs text-[var(--foreground-subtle)]">—</span>
+                          <span className="text-xs text-[var(--foreground-subtle)]">\u2014</span>
                         )}
                       </div>
                     </div>
@@ -697,44 +690,46 @@ export default function ForecastPage() {
                 })}
               </>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* Per-Site Breakdown */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Per-Site Breakdown</CardTitle>
+      <div className="data-table-container">
+        <div className="data-table-toolbar">
+          <div className="flex items-center justify-between w-full">
+            <h2 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
+              Per-Site Breakdown
+            </h2>
             <Badge variant="secondary">{projectedSites.length} sites</Badge>
           </div>
-        </CardHeader>
+        </div>
         {loading ? (
-          <CardContent className="space-y-2 pb-4">
+          <div className="p-4 space-y-2">
             {Array.from({ length: 5 }).map((_, i) => (
               <Skeleton key={i} className="h-10 w-full" />
             ))}
-          </CardContent>
+          </div>
         ) : projectedSites.length === 0 ? (
-          <CardContent className="py-12 text-center text-sm text-[var(--foreground-muted)]">
+          <div className="py-12 text-center text-sm text-[var(--foreground-muted)]">
             No site data for this period
-          </CardContent>
+          </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Site</TableHead>
-                <TableHead>Bundle</TableHead>
-                <TableHead className="text-right">CPM</TableHead>
-                {hasScenario && <TableHead className="text-right">Proj CPM</TableHead>}
-                <TableHead className="text-right">Revenue</TableHead>
-                {hasScenario && <TableHead className="text-right">Proj Rev</TableHead>}
-                <TableHead className="text-right">ROMI</TableHead>
-                {hasScenario && <TableHead className="text-right">Proj ROMI</TableHead>}
-                <TableHead className="text-right">Traffic</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <table>
+            <thead>
+              <tr>
+                <th>Site</th>
+                <th>Bundle</th>
+                <th className="text-right">CPM</th>
+                {hasScenario && <th className="text-right">Proj CPM</th>}
+                <th className="text-right">Revenue</th>
+                {hasScenario && <th className="text-right">Proj Rev</th>}
+                <th className="text-right">ROMI</th>
+                {hasScenario && <th className="text-right">Proj ROMI</th>}
+                <th className="text-right">Traffic</th>
+              </tr>
+            </thead>
+            <tbody>
               {projectedSites
                 .sort((a, b) => b.revenue - a.revenue)
                 .map((site) => {
@@ -746,39 +741,39 @@ export default function ForecastPage() {
                     "text-[var(--foreground-muted)]";
 
                   return (
-                    <TableRow key={site.id}>
-                      <TableCell className="font-medium text-[var(--foreground)]">
+                    <tr key={site.id}>
+                      <td className="font-medium text-[var(--foreground)]">
                         {site.name}
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td>
                         <span className={cn("text-xs font-medium", bundleColor)}>
                           {site.bundle.name}
                         </span>
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
-                        {site.realCpm > 0 ? `$${site.realCpm.toFixed(3)}` : "—"}
-                      </TableCell>
+                      </td>
+                      <td className="text-right tabular-nums text-[var(--foreground-muted)]">
+                        {site.realCpm > 0 ? `$${site.realCpm.toFixed(3)}` : "\u2014"}
+                      </td>
                       {hasScenario && (
-                        <TableCell className="text-right tabular-nums">
+                        <td className="text-right tabular-nums">
                           <span className="text-indigo-600 font-medium">
-                            {site.projCpm > 0 ? `$${site.projCpm.toFixed(3)}` : "—"}
+                            {site.projCpm > 0 ? `$${site.projCpm.toFixed(3)}` : "\u2014"}
                           </span>
-                        </TableCell>
+                        </td>
                       )}
-                      <TableCell className="text-right tabular-nums font-medium text-emerald-600">
+                      <td className="text-right tabular-nums font-medium text-emerald-600">
                         {formatCurrency(site.revenue)}
-                      </TableCell>
+                      </td>
                       {hasScenario && (
-                        <TableCell className="text-right">
+                        <td className="text-right">
                           <div className="flex flex-col items-end">
                             <span className="tabular-nums font-medium text-indigo-600">
                               {formatCurrency(site.projRevenue)}
                             </span>
                             <DeltaBadge delta={site.revenueDelta} format="currency" />
                           </div>
-                        </TableCell>
+                        </td>
                       )}
-                      <TableCell className="text-right tabular-nums">
+                      <td className="text-right tabular-nums">
                         <span className={cn(
                           "font-medium",
                           site.romi >= 100 ? "text-emerald-600" :
@@ -786,9 +781,9 @@ export default function ForecastPage() {
                         )}>
                           {formatPercent(site.romi)}
                         </span>
-                      </TableCell>
+                      </td>
                       {hasScenario && (
-                        <TableCell className="text-right">
+                        <td className="text-right">
                           <div className="flex flex-col items-end">
                             <span className={cn(
                               "tabular-nums font-medium",
@@ -799,18 +794,18 @@ export default function ForecastPage() {
                             </span>
                             <DeltaBadge delta={site.romiDelta} format="pp" />
                           </div>
-                        </TableCell>
+                        </td>
                       )}
-                      <TableCell className="text-right tabular-nums text-[var(--foreground-muted)]">
+                      <td className="text-right tabular-nums text-[var(--foreground-muted)]">
                         {formatNumber(site.traffic)}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   );
                 })}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         )}
-      </Card>
+      </div>
     </motion.div>
   );
 }

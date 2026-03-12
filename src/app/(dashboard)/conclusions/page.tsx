@@ -2,12 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
 import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
@@ -84,7 +78,7 @@ function ConclusionSection({
   accent: "red" | "green";
   items: ConclusionCard[];
 }) {
-  const accentColor = accent === "red" ? "border-red-500/20" : "border-emerald-500/20";
+  const accentBorder = accent === "red" ? "border-red-500/20" : "border-emerald-500/20";
   const iconColor = accent === "red" ? "text-red-600" : "text-emerald-600";
 
   return (
@@ -96,8 +90,11 @@ function ConclusionSection({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => (
-          <Card key={item.id} className={cn("relative overflow-hidden", accentColor)}>
-            <CardHeader className="pb-2 p-4">
+          <div
+            key={item.id}
+            className={cn("section-panel relative overflow-hidden", accentBorder)}
+          >
+            <div className="p-4 pb-2">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-subtle)]">
                   {item.category}
@@ -113,9 +110,11 @@ function ConclusionSection({
                   </span>
                 )}
               </div>
-              <CardTitle className="text-base">{item.entity}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 p-4 pt-0">
+              <h3 style={{ fontSize: "var(--text-base, 1rem)", fontWeight: 600, color: "var(--foreground)" }}>
+                {item.entity}
+              </h3>
+            </div>
+            <div className="space-y-2 p-4 pt-0">
               <div>
                 <span className="text-xs text-[var(--foreground-muted)]">{item.metricName}</span>
                 <p
@@ -144,14 +143,14 @@ function ConclusionSection({
               <p className="text-[11px] leading-relaxed text-[var(--foreground-muted)]">
                 {item.explanation}
               </p>
-            </CardContent>
+            </div>
             <div
               className={cn(
                 "absolute bottom-0 left-0 right-0 h-[2px] opacity-30",
                 accent === "red" ? "bg-red-500" : "bg-emerald-500"
               )}
             />
-          </Card>
+          </div>
         ))}
       </div>
     </div>

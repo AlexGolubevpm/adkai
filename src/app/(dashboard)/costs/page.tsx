@@ -9,16 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
 import { NativeSelect as Select, SelectOption } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -292,8 +283,8 @@ export default function CostsPage() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
           >
-            <Card className="border-emerald-500/20 bg-emerald-500/5">
-              <CardContent className="p-4">
+            <div className="section-panel" style={{ borderColor: "rgba(34,197,94,0.2)", background: "rgba(34,197,94,0.05)" }}>
+              <div className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -307,7 +298,7 @@ export default function CostsPage() {
                   {syncResults.map((r) => (
                     <div key={r.configName} className="text-xs text-[var(--foreground-muted)]">
                       <span className="font-medium text-[var(--foreground)]">{r.configName}</span>
-                      {" — "}
+                      {" \u2014 "}
                       <span className="text-emerald-600">{r.matched} matched</span>
                       {r.unmatched > 0 && (
                         <span className="text-amber-600"> / {r.unmatched} unmatched</span>
@@ -318,8 +309,8 @@ export default function CostsPage() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -359,39 +350,43 @@ export default function CostsPage() {
 
         {/* ─── Cost Entries Tab ─── */}
         <TabsContent value="entries">
-          <Card>
-            {costsLoading ? (
-              <CardContent className="p-6 space-y-3">
+          {costsLoading ? (
+            <div className="section-panel">
+              <div className="p-6 space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Skeleton key={i} className="h-10 w-full" />
                 ))}
-              </CardContent>
-            ) : filtered.length === 0 ? (
-              <CardContent className="p-12 text-center">
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="section-panel">
+              <div className="p-12 text-center">
                 <FileSpreadsheet className="h-12 w-12 mx-auto text-[var(--foreground-subtle)] mb-3" />
                 <p className="text-sm text-[var(--foreground-muted)]">
                   No cost entries yet. Connect a Google Sheet and sync to import costs.
                 </p>
-              </CardContent>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Site</TableHead>
-                    <TableHead>Bundle</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Cost</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Synced</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              </div>
+            </div>
+          ) : (
+            <div className="data-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Site</th>
+                    <th>Bundle</th>
+                    <th>Date</th>
+                    <th className="text-right">Cost</th>
+                    <th>Source</th>
+                    <th>Synced</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {filtered.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell className="font-medium text-[var(--foreground)]">
+                    <tr key={entry.id}>
+                      <td className="font-medium text-[var(--foreground)]">
                         {entry.siteName}
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td>
                         <span
                           className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${
                             BUNDLE_COLORS[entry.bundleName] ?? ""
@@ -399,28 +394,28 @@ export default function CostsPage() {
                         >
                           {entry.bundleName}
                         </span>
-                      </TableCell>
-                      <TableCell className="tabular-nums text-[var(--foreground-muted)]">
+                      </td>
+                      <td className="tabular-nums text-[var(--foreground-muted)]">
                         {entry.date}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums font-medium text-red-600">
+                      </td>
+                      <td className="text-right tabular-nums font-medium text-red-600">
                         {formatCurrency(entry.cost)}
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td>
                         <div className="flex items-center gap-1.5 text-[var(--foreground-muted)]">
                           <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-500" />
                           <span className="text-xs">{entry.source}</span>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-xs text-[var(--foreground-subtle)]">
-                        {entry.syncedAt ? formatRelativeTime(entry.syncedAt) : "—"}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                      <td className="text-xs text-[var(--foreground-subtle)]">
+                        {entry.syncedAt ? formatRelativeTime(entry.syncedAt) : "\u2014"}
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
-            )}
-          </Card>
+                </tbody>
+              </table>
+            </div>
+          )}
         </TabsContent>
 
         {/* ─── Google Sheets Tab ─── */}
@@ -432,8 +427,8 @@ export default function CostsPage() {
               ))}
             </div>
           ) : configs.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
+            <div className="section-panel">
+              <div className="p-12 text-center">
                 <Link2 className="h-12 w-12 mx-auto text-[var(--foreground-subtle)] mb-3" />
                 <p className="text-sm font-medium text-[var(--foreground)]">
                   No Google Sheets connected
@@ -445,13 +440,13 @@ export default function CostsPage() {
                   <Plus className="h-3.5 w-3.5" />
                   Connect Sheet
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ) : (
             <div className="space-y-3">
               {configs.map((config) => (
-                <Card key={config.id} className="relative overflow-hidden">
-                  <CardContent className="p-4">
+                <div key={config.id} className="section-panel relative overflow-hidden">
+                  <div className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
@@ -507,12 +502,12 @@ export default function CostsPage() {
                         </Button>
                       </div>
                     </div>
-                  </CardContent>
+                  </div>
                   <div
                     className="absolute bottom-0 left-0 right-0 h-[2px] opacity-40"
                     style={{ backgroundColor: config.isActive ? "#22c55e" : "#6b7280" }}
                   />
-                </Card>
+                </div>
               ))}
             </div>
           )}
@@ -521,49 +516,49 @@ export default function CostsPage() {
         {/* ─── Unmatched Tab ─── */}
         {syncResults?.some((r) => r.unmatched > 0) && (
           <TabsContent value="unmatched">
-            <Card className="border-yellow-500/20">
-              <CardHeader>
+            <div className="data-table-container" style={{ borderColor: "rgba(234,179,8,0.2)" }}>
+              <div className="data-table-toolbar">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <CardTitle>Unmatched Entries</CardTitle>
+                  <h3 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--foreground)" }}>
+                    Unmatched Entries
+                  </h3>
                 </div>
                 <p className="text-xs text-[var(--foreground-muted)]">
                   Rows from Google Sheets that could not be mapped to any known site.
                 </p>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Row</TableHead>
-                      <TableHead>Raw Site Name</TableHead>
-                      <TableHead className="text-right">Cost</TableHead>
-                      <TableHead>Reason</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {syncResults.flatMap((r) =>
-                      r.unmatchedEntries.map((entry) => (
-                        <TableRow key={`${r.configName}-${entry.row}`}>
-                          <TableCell className="tabular-nums text-[var(--foreground-subtle)]">
-                            #{entry.row}
-                          </TableCell>
-                          <TableCell className="font-medium text-amber-600">
-                            {entry.site}
-                          </TableCell>
-                          <TableCell className="text-right tabular-nums font-medium text-red-600">
-                            {formatCurrency(entry.cost)}
-                          </TableCell>
-                          <TableCell className="text-xs text-[var(--foreground-muted)]">
-                            {entry.reason}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Row</th>
+                    <th>Raw Site Name</th>
+                    <th className="text-right">Cost</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {syncResults.flatMap((r) =>
+                    r.unmatchedEntries.map((entry) => (
+                      <tr key={`${r.configName}-${entry.row}`}>
+                        <td className="tabular-nums text-[var(--foreground-subtle)]">
+                          #{entry.row}
+                        </td>
+                        <td className="font-medium text-amber-600">
+                          {entry.site}
+                        </td>
+                        <td className="text-right tabular-nums font-medium text-red-600">
+                          {formatCurrency(entry.cost)}
+                        </td>
+                        <td className="text-xs text-[var(--foreground-muted)]">
+                          {entry.reason}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </TabsContent>
         )}
       </Tabs>
@@ -819,7 +814,7 @@ function AddSheetModalContent({
                       <Input
                         value={usersColumn}
                         onChange={(e) => setUsersColumn(e.target.value)}
-                        placeholder="—"
+                        placeholder="\u2014"
                         className="text-center"
                         maxLength={2}
                       />
