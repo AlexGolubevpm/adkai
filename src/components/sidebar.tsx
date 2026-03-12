@@ -10,6 +10,8 @@ import {
   Brain,
   Activity,
   TrendingUp,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,31 +54,54 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-[var(--border)] bg-[var(--surface-0)]">
+    <aside
+      className="fixed left-0 top-0 z-40 flex h-screen flex-col transition-all duration-300"
+      style={{
+        width: collapsed ? 72 : 260,
+        borderRight: "1px solid var(--border)",
+        background: "var(--surface-0)",
+      }}
+    >
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2.5 px-5 border-b border-[var(--border)]">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 shadow-sm shadow-indigo-500/25">
+      <div
+        className="flex h-14 items-center border-b"
+        style={{
+          borderColor: "var(--border)",
+          padding: collapsed ? "0 16px" : "0 20px",
+          gap: collapsed ? 0 : 10,
+        }}
+      >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500 shadow-sm shadow-indigo-500/25">
           <Activity className="h-4 w-4 text-white" />
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-base font-bold text-[var(--foreground)] tracking-tight">
-            AdKai
-          </span>
-          <span className="text-[10px] font-medium text-[var(--foreground-subtle)] uppercase tracking-widest">
-            Analytics
-          </span>
-        </div>
+        {!collapsed && (
+          <div className="flex items-baseline gap-1.5 overflow-hidden">
+            <span className="text-base font-bold tracking-tight" style={{ color: "var(--foreground)" }}>
+              AdKai
+            </span>
+            <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "var(--foreground-subtle)" }}>
+              Analytics
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5">
-        <p className="px-3 pb-2 pt-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--foreground-subtle)]">
-          Navigation
-        </p>
+      <nav className="flex-1 space-y-0.5 overflow-hidden" style={{ padding: "12px 8px" }}>
+        {!collapsed && (
+          <p className="px-3 pb-2 pt-3 text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--foreground-subtle)" }}>
+            Navigation
+          </p>
+        )}
         {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
@@ -86,38 +111,46 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              title={collapsed ? item.label : undefined}
               className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
+                "group flex items-center rounded-lg text-sm font-medium transition-all duration-150",
+                collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
                 isActive
                   ? "bg-indigo-500/10 text-indigo-400"
-                  : "text-[var(--foreground-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"
+                  : "hover:bg-[var(--surface-2)]"
               )}
+              style={
+                !isActive
+                  ? { color: "var(--foreground-muted)" }
+                  : undefined
+              }
             >
               <div
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-150",
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors duration-150",
                   isActive
                     ? "bg-indigo-500/15 text-indigo-400"
-                    : "bg-[var(--surface-2)] text-[var(--foreground-subtle)] group-hover:text-[var(--foreground-muted)]"
+                    : "text-[var(--foreground-subtle)] group-hover:text-[var(--foreground-muted)]"
                 )}
+                style={!isActive ? { background: "var(--surface-2)" } : undefined}
               >
                 <Icon className="h-4 w-4" />
               </div>
-              <div className="flex flex-col">
-                <span className="leading-tight">{item.label}</span>
-                <span
-                  className={cn(
-                    "text-[10px] leading-tight transition-colors",
-                    isActive
-                      ? "text-indigo-400/60"
-                      : "text-[var(--foreground-subtle)]"
+              {!collapsed && (
+                <>
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="leading-tight truncate">{item.label}</span>
+                    <span
+                      className="text-[10px] leading-tight transition-colors truncate"
+                      style={{ color: isActive ? "rgba(129, 140, 248, 0.6)" : "var(--foreground-subtle)" }}
+                    >
+                      {item.description}
+                    </span>
+                  </div>
+                  {isActive && (
+                    <div className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500" />
                   )}
-                >
-                  {item.description}
-                </span>
-              </div>
-              {isActive && (
-                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                </>
               )}
             </Link>
           );
@@ -125,15 +158,31 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-[var(--border)] px-4 py-3">
-        <div className="flex items-center gap-2">
-          <div className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+      <div className="border-t" style={{ borderColor: "var(--border)", padding: "12px 16px" }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </div>
+            {!collapsed && (
+              <span className="text-xs" style={{ color: "var(--foreground-subtle)" }}>
+                System online
+              </span>
+            )}
           </div>
-          <span className="text-xs text-[var(--foreground-subtle)]">
-            System online
-          </span>
+          <button
+            onClick={onToggle}
+            className="flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-[var(--surface-2)]"
+            style={{ color: "var(--foreground-subtle)" }}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
+          </button>
         </div>
       </div>
     </aside>
